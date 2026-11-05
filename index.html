@@ -1,4 +1,12 @@
 <title>Quản Lý Dự án - Stellar</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="QLDA Stellar">
+<meta name="theme-color" content="#12233F">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese">
@@ -21,7 +29,7 @@ body{margin:0;color:var(--ink);font:14px/1.5 var(--f-ui);-webkit-font-smoothing:
 button,input,select,textarea{font:inherit;color:inherit}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
-.wrap{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:none;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--navy)}
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--navy);color:var(--on-navy);box-shadow:0 2px 10px rgba(18,35,63,.18)}
 header.top .brand span{color:var(--on-navy-2)}
@@ -185,7 +193,9 @@ tr.grp.lu td{background:var(--navy);color:#fff;border-left:4px solid var(--lc);l
 .kq.ok,.bl.ok{--kc:var(--good);--ks:var(--good-soft)} .kq.doi,.bl.doi{--kc:var(--accent);--ks:var(--accent-soft)}
 .kq.vm,.bl.vm{--kc:var(--crit);--ks:var(--crit-soft)} .kq.khong,.bl.khong{--kc:var(--idle);--ks:var(--idle-soft)}
 .bgrp{background:var(--navy);color:#fff;border-left:4px solid var(--lc);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
-.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+@media (hover:none) and (pointer:coarse) and (max-width:1100px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.board{grid-template-columns:1fr}}
 .bcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .bcard .bh{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .kqrow{display:flex;gap:6px;flex-wrap:wrap;min-height:4px}
@@ -822,7 +832,8 @@ function markRa(nid){var n=S.data.BaoCaoTuan.filter(function(x){return x.id===ni
 /* ================= BÁO CÁO TUẦN (VIỆC CỦA TÔI) ================= */
 function vMine(v){
   var w=S.week,prev=add(w,-7);
-  if(!S.person||IX.people.indexOf(S.person)<0)S.person=IX.people.indexOf(S.user.ten)>=0?S.user.ten:IX.people[0];
+  if(!canReview())S.person=S.user.ten;
+  else if(!S.person||IX.people.indexOf(S.person)<0)S.person=IX.people.indexOf(S.user.ten)>=0?S.user.ten:IX.people[0];
   var person=S.person,can=S.user.ten===person||canReview();
   var mine=S.data.CongViec.filter(function(t){return t.nguoi_pt===person&&t.cap!=='moc'&&t.cap!=='xoa'&&IX.pj[t.ma_da]&&IX.pj[t.ma_da].trang_thai==='Đang chạy'});
   var list=mine.filter(function(t){
@@ -844,7 +855,7 @@ function vMine(v){
   var doneW=function(t){return (IX.notesByTask[t.id]||[]).some(function(n){return n.tuan===w&&n.nguon!=='Excel gốc'})};
   var nDone=list.filter(doneW).length;
   var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Tuần '+weekNo(w)+' · '+dm(w)+'–'+dmy(add(w,6))+'</div><h1>Nhập báo cáo</h1></div>'+
-   '<div class="filters"><label class="muted" style="font-size:12px">Người <select id="mp">'+IX.people.map(function(p){return '<option'+(p===person?' selected':'')+'>'+esc(p)+'</option>'}).join('')+'</select></label>'+
+   '<div class="filters">'+(canReview()?'<label class="muted" style="font-size:12px">Người <select id="mp">'+IX.people.map(function(p){return '<option'+(p===person?' selected':'')+'>'+esc(p)+'</option>'}).join('')+'</select></label>':'')+
    '<div class="seg" id="mf">'+[['dang','Cần báo cáo'],['tat-ca','Tất cả được giao']].map(function(x){return '<button data-f="'+x[0]+'" class="'+(S.myFilter===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div></div>';
   html+='<div class="qbar"><div class="qprog"><b class="mono">'+nDone+'/'+list.length+'</b> hạng mục đã báo cáo tuần này<i><b style="width:'+(list.length?nDone/list.length*100:0)+'%"></b></i></div>'+
    '<div class="muted" style="font-size:12px">Mỗi hạng mục chọn 1 nút: <b>Đúng kế hoạch</b> nếu làm như đã hẹn tuần trước; <b>Có thay đổi</b> hoặc <b>Vướng</b> thì ghi 1 dòng; <b>Không phát sinh</b> nếu tuần này không có việc. Ghi kế hoạch tuần tới rồi bấm Gửi.</div></div>';
@@ -872,7 +883,7 @@ function vMine(v){
   var plans={};list.forEach(function(t){plans[t.id]=planOf(t)});
   var count=function(){var n=Object.keys(draft).filter(function(k){var d=draft[k];return d.k||d.kh}).length;var e=document.getElementById('qcount');if(e)e.textContent=n?n+' hạng mục đã chọn, chưa gửi':'Chưa chọn hạng mục nào';};
   count();
-  document.getElementById('mp').onchange=function(){S.person=this.value;render()};
+  var mpEl=document.getElementById('mp');if(mpEl)mpEl.onchange=function(){S.person=this.value;render()};
   document.querySelectorAll('#mf button').forEach(function(b){b.onclick=function(){S.myFilter=b.dataset.f;render()}});
   v.querySelectorAll('[data-open]').forEach(function(b){b.onclick=function(){openTask(b.dataset.open)}});
   v.querySelectorAll('[data-lk]').forEach(function(b){b.onclick=function(){openLinks(b.dataset.lk)}});
