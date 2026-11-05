@@ -458,7 +458,13 @@ function renderLogin(){
 function logoutLocal(){try{store(CKEY(),null)}catch(e){}S.token=null;S.user=null;S.data=null;store('qltk_tok',null);store('qltk_user',null);render()}
 /* Dữ liệu gọn dạng {cols, rows} → mảng đối tượng */
 function unpack(t){if(!t||!t.cols)return t||[];return t.rows.map(function(r){var o={};for(var i=0;i<t.cols.length;i++)o[t.cols[i]]=r[i];return o})}
+/* Danh mục mặc định: dùng khi tab DanhMuc bị thiếu hoặc mất tiêu đề cột */
+var DM_MAC_DINH={trang_thai_hm:['Chưa bắt đầu','Đang triển khai','Chờ CĐT/phòng ban','Chờ thẩm tra/thẩm định','Hoàn thành','Tạm dừng','Không thực hiện'],
+  trang_thai_da:['Đang chạy','Tạm dừng','Chuẩn bị','Kết thúc'],loai_bc:['Đã làm','KH tuần tới','Vướng mắc'],
+  loai_vm:['Thanh toán','CĐT chưa chốt','TVTK/thầu phụ chậm','Thẩm tra/thẩm định','Pháp lý/quy hoạch','Khác'],rag:['Xanh','Vàng','Đỏ','Xám'],
+  giai_doan:['Quy hoạch','Concept','MKT','Thỏa thuận','BCNCKT/TKCS','CPXD','TKKT/BVTC','Thi công'],tinh_trang_so_lieu:['Nhập tay','Chờ rà','Đã rà'],vai_tro:['Trưởng','Duyệt','Nhập liệu','Xem'],luong:['UNI','RMH','LHS']};
 function useData(d){
+  d.DanhMuc=d.DanhMuc||{};Object.keys(DM_MAC_DINH).forEach(function(k){if(!d.DanhMuc[k]||!d.DanhMuc[k].length)d.DanhMuc[k]=DM_MAC_DINH[k]});
   ['DuAn','MocCDT','CongViec','BaoCaoTuan','DanhGiaTuan','MauHangMuc','LienKet'].forEach(function(k){d[k]=unpack(d[k])});
   S.data=d;if(d.user)S.user=d.user;S.week=S.week||d.tuan_hien_tai;S.person=S.person||S.user.ten;S.oldLoaded=!d.so_ghi_chu_cu;
   index();
