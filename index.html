@@ -7,6 +7,22 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
+<meta name="viewport" id="vp" content="width=device-width,initial-scale=1">
+<script>
+/* Điện thoại: màn đăng nhập vừa khít màn hình; sau khi đăng nhập giữ bố cục rộng, chữ phóng to (iPhone ×1,2, Android ×1,5) */
+(function(){
+  var ua=navigator.userAgent,and=/Android/i.test(ua),ios=/iPhone|iPod/i.test(ua);
+  var phone=(and&&/Mobile/i.test(ua))||ios;
+  window.setVP=function(mode){
+    if(!phone)return;
+    var m=document.getElementById('vp');
+    m.setAttribute('content',mode==='login'?'width=device-width,initial-scale=1':'width='+Math.round(980/(and?1.5:1.2)));
+  };
+  if(phone)setVP('app');else document.getElementById('vp').setAttribute('content','width=device-width,initial-scale=1');
+  if('serviceWorker' in navigator&&location.protocol==='https:'&&!/script\.google/.test(location.host))
+    window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+})();
+</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese">
@@ -49,6 +65,7 @@ header.top nav.tabs a.on{color:#fff;border-bottom-color:#7FB6E8}
 .brand{align-items:center}
 .logo{height:34px;width:auto;display:block;filter:var(--logo-f)}
 .logo.big{height:40px}
+.login .logo{filter:brightness(0) opacity(.85)}
 .brand b{border-left:1px solid var(--line);padding-left:10px;font-size:16px;font-weight:700;letter-spacing:-.01em}
 .brand span{font-size:12px;color:var(--muted)}
 .week{display:flex;align-items:center;gap:4px;background:var(--sunk);border-radius:999px;padding:3px}
@@ -225,6 +242,7 @@ tr.grp.lu td{background:var(--navy);color:#fff;border-left:4px solid var(--lc);l
 .erow .ok{border-color:var(--good)!important;box-shadow:0 0 0 2px var(--good-soft)}
 .erow .err{border-color:var(--crit)!important}
 .login{max-width:380px;margin:60px auto;display:flex;flex-direction:column;gap:12px}
+.login input,.login select,.login button{font-size:16px;min-height:44px}
 mark{background:var(--warn-soft);color:inherit;border-radius:2px}
 .loading{padding:60px 0;text-align:center;color:var(--muted)}
 @media (max-width:640px){h1{font-size:19px}.kpi .v{font-size:22px}.brand span{display:none}}
@@ -426,7 +444,8 @@ function shell(){
     '<main class="wrap" id="view"></main>';
 }
 function render(){
-  if(!S.user)return renderLogin();
+  if(!S.user){if(window.setVP)setVP('login');return renderLogin()}
+  if(window.setVP)setVP('app');
   if(!S.data){document.getElementById('root').innerHTML='<div class="loading">Đang tải dữ liệu…</div>';return}
   document.getElementById('root').innerHTML=shell();
   var v=document.getElementById('view');
