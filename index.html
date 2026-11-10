@@ -224,7 +224,13 @@ tr.grp.lu td{background:var(--navy);color:#fff;border-left:4px solid var(--lc);l
 @media (hover:none) and (pointer:coarse) and (max-width:1100px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.board{grid-template-columns:1fr}}
 .bcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.bcard .bh{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bcard .bh{display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--navy);margin:-12px -14px 0;padding:9px 14px;border-radius:9px 9px 0 0}
+.bcard .bh .pn{padding:0;font-size:15px;background:none}
+.bcard .bh .kq{font-size:11.5px;padding:1px 8px}
+.bcard .bh .st.stop{background:rgba(255,255,255,.14);color:#D6DEEA}
+.kqleg .kq[data-go]{cursor:pointer} .kqleg .kq[data-go]:hover{filter:brightness(.95);box-shadow:0 0 0 1px var(--kc)}
+.bl.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--kc)}100%{box-shadow:0 0 0 0 transparent}}
 .kqrow{display:flex;gap:6px;flex-wrap:wrap;min-height:4px}
 .blist{display:flex;flex-direction:column;gap:6px}
 .bl{border-left:3px solid var(--kc);background:var(--ks);border-radius:0 6px 6px 0;padding:6px 8px;font-size:12.5px;line-height:1.4;cursor:pointer;word-break:break-word}
@@ -442,17 +448,19 @@ function lchip(L){return '<span class="lchip lu-'+L+'">'+L+'</span>'}
 function pnHtml(p){return '<b class="pn">'+esc(p.ten)+'</b>'}
 /* Mác (TAG) do admin gắn: giữ nguyên các tuần sau cho tới khi đổi */
 function tagOf(ma){var best=null;(S.data.DanhGiaTuan||[]).forEach(function(r){if(r.ma_da===ma&&r.tuan<=S.week&&(!best||r.tuan>best.tuan))best=r});return best&&best.rag||''}
-var TAGS=['Xanh','Vàng','Đỏ','Xám'];
+var TAGS=['Xanh','Vàng','Đỏ','Xám'];var TAG_EN={Xanh:'Green',Vàng:'Yellow',Đỏ:'Red',Xám:'Grey'};
+var STT_EN={'Tạm dừng':'On hold','Chuẩn bị':'Preparing','Kết thúc':'Closed','Đang chạy':'Active'};
 function pjName(ma){var p=IX.pj[ma];return p?p.ten:ma}
 
 /* ================= KHUNG ================= */
-var VIEWS=[['tong-quan','Tổng quan'],['bao-cao-tuan','Báo cáo tuần'],['bao-cao','Nhập báo cáo'],['du-an','Dự án'],['tra-cuu','Tra cứu']];
+var VIEWS=[['tong-quan','Overview'],['bao-cao-tuan','Weekly Report'],['bao-cao','Submit Report'],['du-an','Projects'],['tra-cuu','Search']];
+var ROLE_EN={'Trưởng':'Lead','Duyệt':'Reviewer','Nhập liệu':'Member','Xem':'Viewer'};
 function shell(){
   var w=S.week;
   return '<header class="top"><div class="wrap bar">'+
-    '<div class="brand">'+logoHtml()+'<b>'+esc(APP_NAME)+'</b><span>Báo cáo nội bộ · UNI · RMH · LHS</span></div>'+
-    '<div class="week" role="group" aria-label="Chọn tuần"><button id="wPrev" aria-label="Tuần trước">‹</button><span class="lbl">Tuần '+weekNo(w)+'<small class="mono">'+dm(w)+'–'+dmy(add(w,6))+'</small></span><button id="wNext" aria-label="Tuần sau">›</button><button id="wNow" aria-label="Về tuần hiện tại" title="Về tuần hiện tại">•</button></div>'+
-    '<div class="user"><span class="chip" id="sync" hidden></span>'+(canReview()?'<button class="btn sm'+(S.edit?' on':'')+'" id="editAll" title="Bật để hiện các nút sửa ở mọi màn">'+(S.edit?'✓ Đang chỉnh sửa':'✎ Chỉnh sửa')+'</button>':'')+'<span class="chip">'+esc(S.user.ten)+' · '+esc(S.user.vai_tro)+'</span><button class="btn sm" id="logout">Đổi người</button></div>'+
+    '<div class="brand">'+logoHtml()+'<b>'+esc(APP_NAME)+'</b><span>Internal report · UNI · RMH · LHS</span></div>'+
+    '<div class="week" role="group" aria-label="Week"><button id="wPrev" aria-label="Previous week">‹</button><span class="lbl">Week '+weekNo(w)+'<small class="mono">'+dm(w)+'–'+dmy(add(w,6))+'</small></span><button id="wNext" aria-label="Next week">›</button><button id="wNow" aria-label="This week" title="This week">•</button></div>'+
+    '<div class="user"><span class="chip" id="sync" hidden></span>'+(canReview()?'<button class="btn sm'+(S.edit?' on':'')+'" id="editAll" title="Show edit controls on every screen">'+(S.edit?'✓ Editing':'✎ Edit')+'</button>':'')+'<span class="chip">'+esc(S.user.ten)+' · '+esc(ROLE_EN[S.user.vai_tro]||S.user.vai_tro)+'</span><button class="btn sm" id="logout">Switch user</button></div>'+
     '</div><div class="wrap"><nav class="tabs">'+VIEWS.map(function(v){return '<a data-v="'+v[0]+'" class="'+(S.view===v[0]?'on':'')+'">'+v[1]+'</a>'}).join('')+'</nav></div></header>'+
     (LIVE?'':'<div class="demo"><div class="wrap">Bản xem thử với dữ liệu từ 3 file Excel (đến tuần 02/11/2026). Thay đổi chỉ lưu tạm trên trình duyệt này, tải lại trang là mất.</div></div>')+
     '<main class="wrap" id="view"></main>';
@@ -472,11 +480,11 @@ function bindShell(){
   document.getElementById('wPrev').onclick=function(){S.week=add(S.week,-7);render()};
   document.getElementById('wNext').onclick=function(){S.week=add(S.week,7);render()};
   document.getElementById('wNow').onclick=function(){S.week=S.data.tuan_hien_tai;render()};
-  var ea=document.getElementById('editAll');if(ea)ea.onclick=function(){S.edit=!S.edit;toast(S.edit?'Đã bật chế độ chỉnh sửa':'Đã tắt chế độ chỉnh sửa');render()};
+  var ea=document.getElementById('editAll');if(ea)ea.onclick=function(){S.edit=!S.edit;toast(S.edit?'Edit mode on':'Edit mode off');render()};
   document.getElementById('logout').onclick=function(){api.logout().catch(function(){});logoutLocal()};
 }
 function go(v,pj){S.view=v;if(pj!==undefined)S.pj=pj;S.drawer=null;try{history.replaceState(null,'','#'+v)}catch(e){}render();window.scrollTo(0,0)}
-function luongSeg(){return '<div class="seg" id="luongSeg">'+[['','Tất cả'],['UNI','UNI'],['RMH','RMH'],['LHS','LHS']].map(function(x){return '<button data-l="'+x[0]+'" class="'+(S.luong===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div>'}
+function luongSeg(){return '<div class="seg" id="luongSeg">'+[['','All'],['UNI','UNI'],['RMH','RMH'],['LHS','LHS']].map(function(x){return '<button data-l="'+x[0]+'" class="'+(S.luong===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div>'}
 function bindLuong(){var s=document.getElementById('luongSeg');if(s)s.querySelectorAll('button').forEach(function(b){b.onclick=function(){S.luong=b.dataset.l;render()}})}
 
 /* ================= ĐĂNG NHẬP ================= */
@@ -551,7 +559,7 @@ function vOverview(v){
   var cnt={Xanh:0,Vàng:0,Đỏ:0,Xám:0};ps.forEach(function(p){var g=tagOf(p.ma);if(g)cnt[g]++});
   var pay={};S.data.BaoCaoTuan.forEach(function(n){if(n.loai_vm==='Thanh toán'&&n.tuan<=w&&n.tuan>=add(w,-28)&&IX.pj[n.ma_da]&&(!S.luong||IX.pj[n.ma_da].luong===S.luong))pay[n.ma_da]=1});
   var hot=S.data.BaoCaoTuan.filter(function(n){return (n.loai==='Vướng mắc'||n.loai_vm)&&n.tuan<=w&&n.tuan>=add(w,-7)&&IX.pj[n.ma_da]&&(!S.luong||IX.pj[n.ma_da].luong===S.luong)}).sort(function(a,b){return a.tuan<b.tuan?1:-1});
-  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Tuần '+weekNo(w)+' · '+dm(w)+'–'+dmy(add(w,6))+'</div><h1>Tổng quan danh mục</h1></div>'+luongSeg()+'</div>';
+  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Week '+weekNo(w)+' · '+dm(w)+'–'+dmy(add(w,6))+'</div><h1>Overview</h1></div>'+luongSeg()+'</div>';
   html+='<div class="kpis">'+
     kpi(run.length+' / '+ps.length,'Dự án đang chạy',ps.filter(function(p){return p.trang_thai==='Tạm dừng'}).length+' tạm dừng · '+ps.filter(function(p){return p.trang_thai==='Chuẩn bị'}).length+' chuẩn bị')+
     kpi('<span style="color:var(--crit)">'+cnt['Đỏ']+'</span> · <span style="color:var(--warn)">'+cnt['Vàng']+'</span> · <span style="color:var(--good)">'+cnt['Xanh']+'</span>','Mác Đỏ · Vàng · Xanh','Admin gắn mác ở Báo cáo tuần')+
@@ -697,7 +705,7 @@ function progHtml(v){if(v===''||v==null)return '';var x=Math.max(0,Math.min(1,Nu
 function vProjectList(v){
   var ps=projects(),q=S.q.toLowerCase();
   if(q)ps=ps.filter(function(p){return (p.ten+' '+p.ten_goi_khac+' '+p.ten_thuong_mai+' '+p.ma).toLowerCase().indexOf(q)>=0});
-  var html='<div class="row" style="justify-content:space-between"><h1>Dự án</h1><div class="filters">'+(adm()?'<button class="btn pri" id="newPj">+ Dự án mới</button>':'')+luongSeg()+'<input type="search" id="pjq" placeholder="Tìm tên, tên khác, mã" value="'+esc(S.q)+'"></div></div>';
+  var html='<div class="row" style="justify-content:space-between"><h1>Projects</h1><div class="filters">'+(adm()?'<button class="btn pri" id="newPj">+ Dự án mới</button>':'')+luongSeg()+'<input type="search" id="pjq" placeholder="Tìm tên, tên khác, mã" value="'+esc(S.q)+'"></div></div>';
   html+='<section class="panel"><div class="scroll"><table class="stick2"><thead><tr><th>Mã</th><th>Dự án</th><th>Luồng</th><th>Loại hình</th><th>Trạng thái</th><th>Hạng mục</th><th>Ghi chú</th><th>Cập nhật gần nhất</th></tr></thead><tbody>'+
     ps.map(function(p){var lw=lastWeek(p);return '<tr class="click'+(tagOf(p.ma)?' tg-'+tagOf(p.ma):'')+'" data-pj="'+p.ma+'"><td class="mono muted">'+p.ma+'</td><td>'+pnHtml(p)+'<div class="muted" style="font-size:12px">'+esc(p.ten_goi_khac)+'</div></td><td>'+p.luong+'</td><td>'+esc(p.loai_hinh)+'</td><td><span class="st '+(p.trang_thai==='Đang chạy'?'run':'stop')+'">'+esc(p.trang_thai)+'</span></td><td class="mono">'+IX.tasksBy[p.ma].filter(function(t){return t.cap==='hangmuc'}).length+'</td><td class="mono">'+IX.notesByPj[p.ma].length+'</td><td class="mono">'+(lw?dmy(lw):'–')+'</td></tr>'}).join('')+
     '</tbody></table></div>'+(ps.length?'':'<div class="empty">Không có dự án khớp.</div>')+'</section>';
@@ -889,7 +897,7 @@ function vMine(v){
   };
   var doneW=function(t){return (IX.notesByTask[t.id]||[]).some(function(n){return n.tuan===w&&n.nguon!=='Excel gốc'})};
   var nDone=list.filter(doneW).length;
-  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Tuần '+weekNo(w)+' · '+dm(w)+'–'+dmy(add(w,6))+'</div><h1>Nhập báo cáo</h1></div>'+
+  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Week '+weekNo(w)+' · '+dm(w)+'–'+dmy(add(w,6))+'</div><h1>Submit Report</h1></div>'+
    '<div class="filters">'+(canReview()?'<label class="muted" style="font-size:12px">Người <select id="mp">'+IX.people.map(function(p){return '<option'+(p===person?' selected':'')+'>'+esc(p)+'</option>'}).join('')+'</select></label>':'')+
    '<div class="seg" id="mf">'+[['dang','Cần báo cáo'],['tat-ca','Tất cả được giao']].map(function(x){return '<button data-f="'+x[0]+'" class="'+(S.myFilter===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div></div>';
   html+='<div class="qbar"><div class="qprog"><b class="mono">'+nDone+'/'+list.length+'</b> hạng mục đã báo cáo tuần này<i><b style="width:'+(list.length?nDone/list.length*100:0)+'%"></b></i></div>'+
@@ -993,26 +1001,25 @@ function vBoard(v){
   var w=S.week,ps=projects(),notes=S.data.BaoCaoTuan.filter(function(n){return n.tuan===w});
   ps=ps.filter(function(p){return p.trang_thai==='Đang chạy'||notes.some(function(n){return n.ma_da===p.ma})});
   var tot={};KQ.forEach(function(k){tot[k[0]]=0});notes.forEach(function(n){var k=kqOf(n);if(tot[k]!=null&&(!S.luong||(IX.pj[n.ma_da]||{}).luong===S.luong))tot[k]++});
-  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Tuần '+weekNo(w)+' · '+dm(w)+'–'+dmy(add(w,6))+'</div><h1>Báo cáo tuần</h1></div>'+luongSeg()+'</div>';
-  html+='<div class="kqleg">'+KQ.map(function(k){return '<span class="kq '+k[0]+'">'+k[2]+' '+k[1]+' <b class="mono">'+tot[k[0]]+'</b></span>'}).join('')+'<span class="muted" style="font-size:12px">Bấm tên dự án để xem lịch sử báo cáo tuần, bấm một dòng để xem lịch sử hạng mục.</span></div>';
+  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Week '+weekNo(w)+' · '+dm(w)+'–'+dmy(add(w,6))+'</div><h1>Weekly Report</h1></div>'+luongSeg()+'</div>';
+  html+='<div class="kqleg">'+KQ.map(function(k){return '<span class="kq '+k[0]+'"'+(tot[k[0]]?' data-go="'+k[0]+'" role="button" tabindex="0" title="Đi tới các ghi chú '+k[1]+'"':'')+'>'+k[2]+' '+k[1]+' <b class="mono">'+tot[k[0]]+'</b></span>'}).join('')+'<span class="muted" style="font-size:12px">Bấm tên dự án để xem lịch sử báo cáo tuần, bấm một dòng để xem lịch sử hạng mục.</span></div>';
   LUONG.forEach(function(L){
     var g=ps.filter(function(p){return p.luong===L});if(!g.length)return;
-    html+='<div class="bgrp lu-'+L+'">'+L+' · '+g.length+' dự án</div><div class="board">';
+    html+='<div class="bgrp lu-'+L+'">'+L+' · '+g.length+(g.length>1?' projects':' project')+'</div><div class="board">';
     g.forEach(function(p){
       var tg=tagOf(p.ma),ns=notes.filter(function(n){return n.ma_da===p.ma}),lw=lastWeek(p),age=lw?Math.round(days(lw,w)/7):null;
       var c={},plans=[],main=[];
       ns.forEach(function(n){var k=kqOf(n);if(k==='kh')plans.push(n);else{c[k]=(c[k]||0)+1;main.push(n)}});
       main.sort(function(a,b){return RANK[kqOf(a)]-RANK[kqOf(b)]});
       var who={};ns.forEach(function(n){if(n.nguoi_nhap)who[n.nguoi_nhap]=1});
-      html+='<article class="bcard'+(tg?' tg-'+tg:'')+'" data-pj="'+p.ma+'"><div class="bh">'+pnHtml(p)+(p.trang_thai!=='Đang chạy'?'<span class="st stop">'+esc(p.trang_thai)+'</span>':'')+'</div>'+
-        '<div class="kqrow">'+KQ.map(function(k){return c[k[0]]?'<span class="kq '+k[0]+'">'+k[2]+' '+c[k[0]]+'</span>':''}).join('')+'</div>'+
+      html+='<article class="bcard'+(tg?' tg-'+tg:'')+'" data-pj="'+p.ma+'"><div class="bh">'+pnHtml(p)+(p.trang_thai!=='Đang chạy'?'<span class="st stop">'+esc(STT_EN[p.trang_thai]||p.trang_thai)+'</span>':'')+KQ.map(function(k){return c[k[0]]?'<span class="kq '+k[0]+'">'+k[2]+' '+c[k[0]]+'</span>':''}).join('')+'</div>'+
         (main.length?'<div class="blist">'+main.slice(0,4).map(function(n){return blHtml(n,110)}).join('')+
-          (main.length>4?'<a class="more" data-more="'+p.ma+'">+ '+(main.length-4)+' ghi chú khác</a>':'')+'</div>':'<div class="bempty">Chưa có cập nhật tuần này</div>')+
-        (plans.length?'<div class="bplan"><b>KH tuần tới:</b> '+esc(short(plans.map(function(n){return n.noi_dung}).join(' · '),140))+'</div>':'')+
-        ((IX.links[p.ma]||[]).length||canLinkNew(p.ma)?'<details class="bmore"><summary>Hồ sơ liên quan ('+(IX.links[p.ma]||[]).length+')</summary>'+lkRow(p.ma)+(canLinkNew(p.ma)?'<a class="more" data-lk="'+p.ma+'">Quản lý nút</a>':'')+'</details>':'')+
-        '<div class="bf"><span>'+(lw?'Cập nhật: <b class="mono">'+dmy(lw)+'</b>':'Chưa có cập nhật')+(Object.keys(who).length?' · '+esc(Object.keys(who).join(', ')):'')+'</span>'+
-        (lw&&age>0?'<span class="st '+(age>=2?'wait':'')+'">'+age+' tuần trước</span>':'')+
-        (adm()?'<select class="btag" data-rg="'+p.ma+'" aria-label="Mác '+esc(p.ten)+'"><option value="">Không gắn mác</option>'+TAGS.map(function(x){return '<option value="'+x+'"'+(tg===x?' selected':'')+'>Mác '+x+'</option>'}).join('')+'</select>':'')+
+          (main.length>4?'<a class="more" data-more="'+p.ma+'">+ '+(main.length-4)+' more notes</a>':'')+'</div>':'<div class="bempty">No update this week</div>')+
+        (plans.length?'<div class="bplan"><b>Next week:</b> '+esc(short(plans.map(function(n){return n.noi_dung}).join(' · '),140))+'</div>':'')+
+        ((IX.links[p.ma]||[]).length||canLinkNew(p.ma)?'<details class="bmore"><summary>Related documents ('+(IX.links[p.ma]||[]).length+')</summary>'+lkRow(p.ma)+(canLinkNew(p.ma)?'<a class="more" data-lk="'+p.ma+'">Manage links</a>':'')+'</details>':'')+
+        '<div class="bf"><span>'+(lw?'Updated: <b class="mono">'+dmy(lw)+'</b>':'No updates yet')+(Object.keys(who).length?' · '+esc(Object.keys(who).join(', ')):'')+'</span>'+
+        (lw&&age>0?'<span class="st '+(age>=2?'wait':'')+'">'+age+(age>1?' weeks':' week')+' ago</span>':'')+
+        (adm()?'<select class="btag" data-rg="'+p.ma+'" aria-label="Tag '+esc(p.ten)+'"><option value="">No tag</option>'+TAGS.map(function(x){return '<option value="'+x+'"'+(tg===x?' selected':'')+'>Tag: '+TAG_EN[x]+'</option>'}).join('')+'</select>':'')+
         '</div></article>';
     });
     html+='</div>';
@@ -1023,6 +1030,13 @@ function vBoard(v){
   v.querySelectorAll('[data-more]').forEach(function(e){e.onclick=function(ev){ev.stopPropagation();openPjHistory(e.dataset.more)}});
   v.querySelectorAll('[data-lk]').forEach(function(e){e.onclick=function(ev){ev.stopPropagation();openLinks(e.dataset.lk)}});
   v.querySelectorAll('.bcard .bh .pn').forEach(function(e){e.style.cursor='pointer';e.title='Xem lịch sử báo cáo tuần';e.onclick=function(){openPjHistory(e.closest('.bcard').dataset.pj)}});
+  v.querySelectorAll('.kqleg [data-go]').forEach(function(ch){var go1=function(){
+    var k=ch.dataset.go,els=[].slice.call(v.querySelectorAll('.bl.'+k));
+    if(!els.length){var pj=[].slice.call(v.querySelectorAll('.bcard')).filter(function(cd){return cd.querySelector('.bh .kq.'+k)});if(pj.length){pj[0].scrollIntoView({behavior:'smooth',block:'center'});return}toast('Không thấy ghi chú');return}
+    var i=(S.goIdx&&S.goIdx.k===k?S.goIdx.i+1:0)%els.length;S.goIdx={k:k,i:i};
+    var e=els[i];e.scrollIntoView({behavior:'smooth',block:'center'});e.classList.remove('flash');void e.offsetWidth;e.classList.add('flash');
+    if(els.length>1)toast((i+1)+'/'+els.length+' · bấm tiếp để tới ghi chú sau');
+  };ch.onclick=go1;ch.onkeydown=function(ev){if(ev.key==='Enter')go1()}});
   bindLvl(v);
   v.querySelectorAll('select.btag').forEach(function(sel){sel.onclick=function(ev){ev.stopPropagation()};sel.onchange=function(){
     var ma=sel.dataset.rg,old=IX.review[ma+'|'+S.week]||{};sel.disabled=true;
@@ -1053,7 +1067,7 @@ function openPjHistory(ma){
 /* ================= TRA CỨU ================= */
 var SQ={q:'',pj:'',who:'',vm:''};
 function vSearch(v){
-  var html='<div class="row" style="justify-content:space-between"><h1>Tra cứu ghi chú</h1></div><div class="filters">'+
+  var html='<div class="row" style="justify-content:space-between"><h1>Search</h1></div><div class="filters">'+
     '<input type="search" id="sq" placeholder="Từ khóa, ví dụ PCCC, thanh toán, thẩm định" value="'+esc(SQ.q)+'" style="flex:1;min-width:220px">'+
     '<select id="spj"><option value="">Mọi dự án</option>'+S.data.DuAn.map(function(p){return '<option value="'+p.ma+'"'+(SQ.pj===p.ma?' selected':'')+'>'+esc(p.ten)+'</option>'}).join('')+'</select>'+
     '<select id="swho"><option value="">Mọi người</option>'+IX.people.map(function(p){return '<option'+(SQ.who===p?' selected':'')+'>'+esc(p)+'</option>'}).join('')+'</select>'+
