@@ -299,6 +299,7 @@ li.lf{padding-top:22px}
 @media print{header,.pfbar,#pv,.hint,.pchk,.foot,.ocwrap .hd,.pleg,.toast,.banner{display:none!important}body{background:#fff}.ocscroll{overflow:visible}.panel{border:0;box-shadow:none}}
 .rb.kn{background:#FFF1D6;color:#8A5A00;font-weight:600}.rb.ext{background:#EEF0F4;color:#5B6678;border:1px dashed #9AA5B5}
 .pchip.ext,.occ.ext{border-style:dashed}.pchip.ext .av,.occ.ext .av{opacity:.75}.pchip.knc{background:#FFF8E8}
+.ocu.dep.ext{border-style:dashed;background:#F4F6F9}.udep.uextc{border-style:dashed;border-top:3px dashed var(--bc);background:#FAFBFC}
 .uext{border-top:1px dashed var(--line);padding-top:6px;margin-top:8px}
 .ulead.u2{margin-left:6px}.ubh .ulead:first-of-type{margin-left:auto}
 .ockn .occ{border-style:dashed;background:#FFFBF2}.oclead{display:flex;gap:8px;justify-content:center}.ocstack .ockn .occ{width:200px}
@@ -1191,7 +1192,7 @@ function pplRole(p,nKids){var c=String(p.chuc_danh||'').toLowerCase();
   return 'Member'}
 function pplIndex(list){
   var X={list:list,by:{},kids:{},bans:[],banColor:{},deps:{}};
-  list.forEach(function(p){if(typeof p.sdt==='number')p.sdt='0'+p.sdt;p.sdt=String(p.sdt||'');X.by[p.ho_ten]=p});
+  list.forEach(function(p){if(typeof p.sdt==='number')p.sdt='0'+p.sdt;p.sdt=String(p.sdt||'').replace(/^'/,'');X.by[p.ho_ten]=p});
   list.forEach(function(p){var m=p.quan_ly&&X.by[p.quan_ly]&&p.quan_ly!==p.ho_ten?p.quan_ly:'';p._mgr=m;(X.kids[m]=X.kids[m]||[]).push(p)});
   list.forEach(function(p){
     p._lv=pplLevel(p.chuc_danh);p._bm=DISC.indexOf(p.bo_mon)>=0?p.bo_mon:pplField(p.chuc_danh);p._bmAuto=DISC.indexOf(p.bo_mon)<0;
@@ -1296,19 +1297,20 @@ function vPeople(v){
       var mem=L.filter(function(p){return p.don_vi_1===b});var mh=mem.filter(pplMatch);if(anyF&&!mh.length)return;
       var leads=mem.filter(function(p){return p._role==='Unit lead'||p._role==='Director'}).map(function(p){return {p:p}}).concat(L.filter(function(p){return p._kn.some(function(k){return k.r==='Unit lead'&&k.u1===b})}).map(function(p){return {p:p,kn:1}}));
       if(!leads.length&&b){var lg=mem.filter(function(p){return !p._mgr||X.by[p._mgr].don_vi_1!==b}).sort(function(a,c){return c._team-a._team})[0];if(lg)leads=[{p:lg}]}
-      var col=X.banColor[b]||'#6B7A90',deps=(X.deps[b]||[]).slice();if(mem.some(function(p){return !p.don_vi_2}))deps.push('');
+      var col=X.banColor[b]||'#6B7A90',extB=b?mem.filter(function(p){return p._ext}):[],deps=(X.deps[b]||[]).filter(function(d){return mem.some(function(p){return p.don_vi_2===d&&extB.indexOf(p)<0})});if(mem.some(function(p){return !p.don_vi_2&&extB.indexOf(p)<0}))deps.push('');
       html+='<section class="uban" style="--bc:'+col+'"><div class="ubh"><h2>'+esc(b||'Unit not recorded')+'</h2><span class="chip">'+mem.length+' people</span>'+(b?leads.map(function(x,i){return '<span class="ulead'+(i?' u2':'')+'" data-pp="'+esc(x.p.ho_ten)+'">'+avatar(x.p)+'<span><i>'+(x.kn?'Lead · concurrent':'Lead')+'</i>'+esc(x.p.ho_ten)+'</span></span>'}).join(''):'')+'</div><div class="ugrid">'+
         deps.filter(function(d){return !f.u2||d===f.u2}).map(function(d){
-          var ps=mem.filter(function(p){return (p.don_vi_2||'')===d});
+          var ps=mem.filter(function(p){return (p.don_vi_2||'')===d&&extB.indexOf(p)<0});
           var heads=ps.filter(function(p){return ['Head of dept','Unit lead','Director'].indexOf(p._role)>=0}),ext=ps.filter(function(p){return p._ext&&heads.indexOf(p)<0}),rest=ps.filter(function(p){return heads.indexOf(p)<0&&!p._ext});
           var knh=d?L.filter(function(p){return p._kn.some(function(k){return (k.r==='Head of dept'||k.r==='Deputy head')&&k.u2===d})}):[];
           var by={};rest.forEach(function(p){(by[p._bm]=by[p._bm]||[]).push(p)});
           var bms=DISC.filter(function(x){return by[x]});
-          return '<div class="udep" data-drop-b="'+esc(b)+'" data-drop-d="'+esc(d)+'"><div class="udh"><b>'+esc(d||'Directly under unit')+'</b><span class="chip">'+ps.length+'</span></div>'+
+          return '<div class="udep" data-drop-b="'+esc(b)+'" data-drop-d="'+esc(d)+'"><div class="udh"><b>'+esc(d||'Unit staff (no department)')+'</b><span class="chip">'+ps.length+'</span></div>'+
             '<div class="ubar">'+bms.map(function(x){return '<i style="flex:'+by[x].length+';background:'+DISC_COLOR[x]+'" title="'+esc(x)+': '+by[x].length+'"></i>'}).join('')+'</div>'+
             (heads.length||knh.length?'<div class="uhead">'+heads.map(function(p){return chip(p,anyF,ED)}).join('')+knh.map(function(p){return chip(p,anyF,false,p._kn.filter(function(k){return k.u2===d})[0])}).join('')+'</div>':(d&&b?'<div class="unohead">No head of department</div>':''))+
             bms.map(function(x){return '<div class="ubm"><span class="dtag" style="--dc:'+DISC_COLOR[x]+'">'+esc(x)+' · '+by[x].length+'</span>'+by[x].sort(function(a,c){return ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||LEVELS.indexOf(a._lv)-LEVELS.indexOf(c._lv)}).map(function(p){return chip(p,anyF,ED)}).join('')+'</div>'}).join('')+
             (ext.length?'<div class="ubm uext"><span class="dtag" style="--dc:#6B7A90">Collaborators & interns · '+ext.length+'</span>'+ext.map(function(p){return chip(p,anyF,ED)}).join('')+'</div>':'')+'</div>'}).join('')+
+        (extB.length&&!f.u2?'<div class="udep uextc"><div class="udh"><b>Collaborators & interns</b><span class="chip">'+extB.length+'</span></div>'+extB.sort(function(a,c){return TYPES.indexOf(a._type)-TYPES.indexOf(c._type)}).map(function(p){return chip(p,anyF,ED)+'<div class="muted" style="font-size:11px;margin:-4px 0 4px 44px">'+esc(p.don_vi_2||'No department')+'</div>'}).join('')+'</div>':'')+
         '</div></section>';
     });
   }
@@ -1432,13 +1434,14 @@ function ocUnits(X,anyF,ED,f){
   bans.forEach(function(b){
     var mem=L.filter(function(p){return p.don_vi_1===b&&p!==root});if(!mem.length)return;
     var col=X.banColor[b],lead=mem.filter(function(p){return p._role==='Unit lead'})[0],klead=L.filter(function(p){return p._kn.some(function(k){return k.r==='Unit lead'&&k.u1===b})});
-    var deps=(X.deps[b]||[]).slice();if(mem.some(function(p){return !p.don_vi_2&&p!==lead}))deps.push('');
+    var extM=mem.filter(function(p){return p._ext&&p!==lead}),deps=(X.deps[b]||[]).filter(function(d){return mem.some(function(p){return p.don_vi_2===d&&!p._ext})});if(mem.some(function(p){return !p.don_vi_2&&p!==lead&&!p._ext}))deps.push('');
     h+='<li>'+box(b,mem.length,col,'ban')+(lead||klead.length?'<div class="oclead">'+klead.map(function(p){return '<div class="ockn">'+ocCard(p,X,anyF,false,false)+'</div>'}).join('')+(lead?ocCard(lead,X,anyF,ED,false):'')+'</div>':'')+'<ul>'+
       deps.filter(function(d){return !f.u2||d===f.u2}).map(function(d){
-        var ps=mem.filter(function(p){return (p.don_vi_2||'')===d&&p!==lead}).sort(function(a,c){return (a._ext-c._ext)||ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||DISC.indexOf(a._bm)-DISC.indexOf(c._bm)});
+        var ps=mem.filter(function(p){return (p.don_vi_2||'')===d&&p!==lead&&!p._ext}).sort(function(a,c){return (a._ext-c._ext)||ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||DISC.indexOf(a._bm)-DISC.indexOf(c._bm)});
         var kh=d?L.filter(function(p){return p._kn.some(function(k){return (k.r==='Head of dept'||k.r==='Deputy head')&&k.u2===d})}):[];
         if(!ps.length)return '';
-        return '<li>'+box(d||'Directly under unit',ps.length,col,'dep')+'<div class="ocstack">'+kh.map(function(p){return '<div class="ockn">'+ocCard(p,X,anyF,false,false)+'</div>'}).join('')+ps.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li>'}).join('')+'</ul></li>';
+        return '<li>'+box(d||'Unit staff (no department)',ps.length,col,'dep')+'<div class="ocstack">'+kh.map(function(p){return '<div class="ockn">'+ocCard(p,X,anyF,false,false)+'</div>'}).join('')+ps.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li>'}).join('')+
+      (extM.length&&!f.u2?'<li>'+box('Collaborators & interns',extM.length,col,'dep ext')+'<div class="ocstack">'+extM.sort(function(a,c){return TYPES.indexOf(a._type)-TYPES.indexOf(c._type)}).map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li>':'')+'</ul></li>';
   });
   var none=L.filter(function(p){return !p.don_vi_1&&p!==root});
   if(none.length&&!f.u1)h+='<li>'+box('Unit not recorded',none.length,'#9AA5B5','ban')+'<ul><li><div class="ocstack">'+none.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li></ul></li>';
