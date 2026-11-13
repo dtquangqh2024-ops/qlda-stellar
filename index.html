@@ -297,6 +297,13 @@ li.lf{padding-top:22px}
 .ocu.dep{background:color-mix(in srgb,var(--bc) 14%,#fff);color:var(--ink);border:1px solid color-mix(in srgb,var(--bc) 40%,transparent);margin-bottom:8px}
 .oclead{margin-top:8px}.ocunits .octg{display:none}
 @media print{header,.pfbar,#pv,.hint,.pchk,.foot,.ocwrap .hd,.pleg,.toast,.banner{display:none!important}body{background:#fff}.ocscroll{overflow:visible}.panel{border:0;box-shadow:none}}
+.rb.kn{background:#FFF1D6;color:#8A5A00;font-weight:600}.rb.ext{background:#EEF0F4;color:#5B6678;border:1px dashed #9AA5B5}
+.pchip.ext,.occ.ext{border-style:dashed}.pchip.ext .av,.occ.ext .av{opacity:.75}.pchip.knc{background:#FFF8E8}
+.uext{border-top:1px dashed var(--line);padding-top:6px;margin-top:8px}
+.ulead.u2{margin-left:6px}.ubh .ulead:first-of-type{margin-left:auto}
+.ockn .occ{border-style:dashed;background:#FFFBF2}.oclead{display:flex;gap:8px;justify-content:center}.ocstack .ockn .occ{width:200px}
+.knr{display:grid;grid-template-columns:130px 1fr 1fr 1.2fr auto;gap:6px;margin-bottom:6px}.knr input,.knr select{min-width:0;font-size:12.5px}
+@media (max-width:640px){.knr{grid-template-columns:1fr 1fr}}
 .foot{text-align:center;font-size:12px;color:var(--muted);padding:18px 16px 28px;border-top:1px solid var(--line);margin-top:24px}
 body:has(.qsend) .foot{padding-bottom:90px}
 .cp{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px;font-size:13px;line-height:1;opacity:.55;vertical-align:baseline}.cp:hover{opacity:1;color:var(--accent)}
@@ -1149,6 +1156,13 @@ var BAN_COLOR=['#2F6FB3','#C46A10','#2E8B57','#8A4FBF','#B23A48','#4A6A8A','#0F8
 var DISC=['Management','Planning','Architecture','Structure','MEP & Infrastructure','Landscape','Interior','BIM','QS & Cost','Procurement','HR & Admin','Operations','Other'];
 var DISC_COLOR={'Management':'#12233F','Planning':'#2E8B57','Architecture':'#2F6FB3','Structure':'#6B4F2A','MEP & Infrastructure':'#C46A10','Landscape':'#5A9A3A','Interior':'#8A4FBF','BIM':'#0F8A8A','QS & Cost':'#B23A48','Procurement':'#A0527A','HR & Admin':'#6B7A90','Operations':'#4A6A8A','Other':'#9AA5B5'};
 var ROLES=['Director','Unit lead','Head of dept','Discipline lead','Expert','Member','Collaborator','Intern'];
+var KN_ROLES=['Unit lead','Head of dept','Deputy head','Discipline lead','Project manager','Other'];
+var TYPES=['Staff','Collaborator','Intern'];
+/* Kiêm nhiệm: mỗi dòng "Vai trò | Ban | Phòng | Ghi chú" */
+function parseKN(t){return String(t||'').split(/\n|;/).map(function(l){var a=l.split('|').map(function(x){return x.trim()});return {r:a[0]||'',u1:a[1]||'',u2:a[2]||'',t:a[3]||''}}).filter(function(k){return k.r||k.t})}
+function knText(k){return (k.t||k.r)+(k.u2||k.u1?' · '+(k.u2||k.u1):'')}
+function pplType(p){if(TYPES.indexOf(p.loai_ns)>=0)return p.loai_ns;var c=String(p.chuc_danh||'').toLowerCase();
+  if(/^ctv|cộng tác/.test(c)||p.vai_tro==='Collaborator')return 'Collaborator';if(/^tts|thực tập/.test(c)||p.vai_tro==='Intern')return 'Intern';return 'Staff'}
 function pplLevel(c){c=String(c||'').toLowerCase();
   if(/tổng giám đốc|giám đốc|phụ trách ban/.test(c))return 'Executive';
   if(/trưởng phòng/.test(c))return 'Head of dept';
@@ -1182,6 +1196,7 @@ function pplIndex(list){
   list.forEach(function(p){
     p._lv=pplLevel(p.chuc_danh);p._bm=DISC.indexOf(p.bo_mon)>=0?p.bo_mon:pplField(p.chuc_danh);p._bmAuto=DISC.indexOf(p.bo_mon)<0;
     p._role=ROLES.indexOf(p.vai_tro)>=0?p.vai_tro:pplRole(p,(X.kids[p.ho_ten]||[]).length);p._roleAuto=ROLES.indexOf(p.vai_tro)<0;
+    p._kn=parseKN(p.kiem_nhiem);p._type=pplType(p);p._ext=p._type!=='Staff';
     if(p.don_vi_1&&X.bans.indexOf(p.don_vi_1)<0)X.bans.push(p.don_vi_1);
     if(p.don_vi_1){var d=X.deps[p.don_vi_1]=X.deps[p.don_vi_1]||[];if(p.don_vi_2&&d.indexOf(p.don_vi_2)<0)d.push(p.don_vi_2)}});
   var cnt=function(b){return list.filter(function(p){return p.don_vi_1===b}).length};
@@ -1204,20 +1219,21 @@ function pplIssues(X){var out=[],add=function(kind,p,msg){out.push({kind:kind,na
     else if(m&&m.don_vi_2&&p.don_vi_2&&m.don_vi_2!==p.don_vi_2&&['Director','Unit lead'].indexOf(m._role)<0)add('Cross-department line',p,p.don_vi_2+' → manager '+m.ho_ten+' ('+m.don_vi_2+'). Fine if this is a discipline (professional) line.');
     if((X.kids[p.ho_ten]||[]).length>=3&&p._roleAuto&&p._role==='Discipline lead')add('Role to confirm',p,'Manages '+(X.kids[p.ho_ten]||[]).length+' people but title is "'+p.chuc_danh+'"');
   });
-  X.bans.forEach(function(b){X.deps[b].forEach(function(d){var hs=X.list.filter(function(p){return p.don_vi_2===d&&p._role==='Head of dept'});
+  X.bans.forEach(function(b){X.deps[b].forEach(function(d){var hs=X.list.filter(function(p){return (p.don_vi_2===d&&p._role==='Head of dept')||p._kn.some(function(k){return k.r==='Head of dept'&&k.u2===d})});
     if(hs.length!==1)out.push({kind:'Department head',name:'',dep:d,msg:d+': '+(hs.length?hs.length+' heads ('+hs.map(function(h){return h.ho_ten}).join(', ')+')':'no head of department')})})});
   return out}
 function given(n){var w=String(n||'').trim().split(/\s+/);return w[w.length-1]||''}
 function avatar(p,size){var col=S.ppl.banColor[p.don_vi_1]||'#6B7A90',c='av'+(size?' '+size:'');
   return p.anh?'<img class="'+c+'" src="'+esc(p.anh)+'" alt="">':'<span class="'+c+'" style="background:'+col+'">'+esc(given(p.ho_ten).charAt(0))+'</span>'}
-function roleBadge(p){return ['Director','Unit lead','Head of dept','Discipline lead'].indexOf(p._role)>=0?'<em class="rb r'+ROLES.indexOf(p._role)+'">'+esc(p._role)+'</em>':''}
+function knBadge(p){return (p._kn||[]).map(function(k){return '<em class="rb kn" title="Concurrent position: '+esc(knText(k))+'">+ '+esc(k.r==='Other'?(k.t||'Other'):k.r)+'</em>'}).join('')+(p._ext?'<em class="rb ext">'+(p._type==='Intern'?'Intern':'CTV')+'</em>':'')}
+function roleBadge(p){return knBadge(p)+['Director','Unit lead','Head of dept','Discipline lead'].indexOf(p._role)>=0?'<em class="rb r'+ROLES.indexOf(p._role)+'">'+esc(p._role)+'</em>':''}
 function pplMatch(p){var f=S.pf||{},q=String(f.q||'').toLowerCase().trim();
   if(f.u1&&p.don_vi_1!==f.u1)return false;if(f.u2&&p.don_vi_2!==f.u2)return false;
-  if(f.rl&&p._role!==f.rl)return false;if(f.fd&&p._bm!==f.fd)return false;
+  if(f.rl&&p._role!==f.rl&&!p._kn.some(function(k){return k.r===f.rl}))return false;if(f.ty&&p._type!==f.ty)return false;if(f.fd&&p._bm!==f.fd)return false;
   if(f.mg&&p._mgr!==f.mg&&p.ho_ten!==f.mg)return false;
   if(q&&(p.ho_ten+' '+p.chuc_danh+' '+p.email+' '+(p.ten_goi||'')).toLowerCase().indexOf(q)<0)return false;
   return true}
-function chip(p,anyF,drag){return '<div class="pchip'+(anyF?(pplMatch(p)?' hit':' dim'):'')+'" data-pp="'+esc(p.ho_ten)+'"'+(drag?' draggable="true"':'')+'>'+avatar(p)+'<div><b>'+esc(p.ho_ten)+roleBadge(p)+'</b><span>'+esc(p.chuc_danh)+'</span></div></div>'}
+function chip(p,anyF,drag,kn){return '<div class="pchip'+(p._ext?' ext':'')+(kn?' knc':'')+(anyF?(pplMatch(p)?' hit':' dim'):'')+'" data-pp="'+esc(p.ho_ten)+'"'+(drag?' draggable="true"':'')+'>'+avatar(p)+'<div><b>'+esc(p.ho_ten)+roleBadge(p)+'</b><span>'+esc(kn?'Concurrent: '+knText(kn):p.chuc_danh)+'</span></div></div>'}
 /* Lưu thay đổi nhân sự + hoàn tác */
 function saveStaff(p,patch,msg){
   var before={};Object.keys(patch).forEach(function(k){before[k]=p[k]||''});
@@ -1231,14 +1247,14 @@ function vPeople(v){
     return}
   var X=S.ppl,f=S.pf=S.pf||{view:'units'},L=X.list,ED=adm();
   if(!L.length){v.innerHTML='<h1>People</h1><div class="panel"><div class="empty">No staff list yet. Add the <b>NhanVien</b> tab to the Google Sheet.</div></div>';return}
-  var hits=L.filter(pplMatch),anyF=f.q||f.u1||f.u2||f.rl||f.fd||f.mg;
+  var hits=L.filter(pplMatch),anyF=f.q||f.u1||f.u2||f.rl||f.fd||f.mg||f.ty;
   var opt=function(id,label,vals,cur){return '<label class="pf"><span>'+label+'</span><select id="'+id+'"><option value="">All</option>'+vals.map(function(x){return '<option'+(x===cur?' selected':'')+'>'+esc(x)+'</option>'}).join('')+'</select></label>'};
   var u2s=[];(f.u1?[f.u1]:X.bans).forEach(function(b){(X.deps[b]||[]).forEach(function(d){if(u2s.indexOf(d)<0)u2s.push(d)})});
   var mgrs=Object.keys(X.kids).filter(function(k){return k}).sort(function(a,b){return a.localeCompare(b,'vi')});
-  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">'+L.length+' people · '+X.bans.length+' units · '+Object.keys(X.deps).reduce(function(s,b){return s+X.deps[b].length},0)+' departments</div><h1>People</h1></div>'+
+  var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">'+TYPES.map(function(t){var n=L.filter(function(p){return p._type===t}).length;return n?n+' '+({Staff:'staff',Collaborator:'collaborators',Intern:'interns'})[t]:''}).filter(Boolean).join(' · ')+' · '+X.bans.length+' units · '+Object.keys(X.deps).reduce(function(s,b){return s+X.deps[b].length},0)+' departments</div><h1>People</h1></div>'+
     '<div class="seg" id="pv">'+[['units','Units'],['chart','Chart'],['matrix','Matrix'],['org','Tree'],['list','List']].map(function(x){return '<button data-v="'+x[0]+'" class="'+(f.view===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div>';
   html+='<div class="pfbar"><label class="pf grow"><span>Search</span><input id="pq" type="search" placeholder="Name, title, email…" value="'+esc(f.q||'')+'"></label>'+
-    opt('pu1','Unit',X.bans,f.u1)+opt('pu2','Department',u2s,f.u2)+opt('prl','Role',ROLES.filter(function(r){return L.some(function(p){return p._role===r})}),f.rl)+
+    opt('pu1','Unit',X.bans,f.u1)+opt('pu2','Department',u2s,f.u2)+opt('prl','Role',ROLES.concat(KN_ROLES).filter(function(r,i,a){return a.indexOf(r)===i&&L.some(function(p){return p._role===r||p._kn.some(function(k){return k.r===r})})}),f.rl)+opt('pty','Type',TYPES.filter(function(t){return L.some(function(p){return p._type===t})}),f.ty)+
     opt('pfd','Discipline',DISC.filter(function(d){return L.some(function(p){return p._bm===d})}),f.fd)+opt('pmg','Manager',mgrs,f.mg)+
     (anyF?'<button class="btn sm" id="pclr">Clear · '+hits.length+'</button>':'')+'</div>';
   if(ED){
@@ -1278,25 +1294,28 @@ function vPeople(v){
     var groups=(f.u1?[f.u1]:X.bans).concat(!f.u1&&L.some(function(p){return !p.don_vi_1})?['']:[]);
     groups.forEach(function(b){
       var mem=L.filter(function(p){return p.don_vi_1===b});var mh=mem.filter(pplMatch);if(anyF&&!mh.length)return;
-      var lead=mem.filter(function(p){return p._role==='Unit lead'||p._role==='Director'})[0]||mem.filter(function(p){return !p._mgr||X.by[p._mgr].don_vi_1!==b}).sort(function(a,c){return c._team-a._team})[0];
+      var leads=mem.filter(function(p){return p._role==='Unit lead'||p._role==='Director'}).map(function(p){return {p:p}}).concat(L.filter(function(p){return p._kn.some(function(k){return k.r==='Unit lead'&&k.u1===b})}).map(function(p){return {p:p,kn:1}}));
+      if(!leads.length&&b){var lg=mem.filter(function(p){return !p._mgr||X.by[p._mgr].don_vi_1!==b}).sort(function(a,c){return c._team-a._team})[0];if(lg)leads=[{p:lg}]}
       var col=X.banColor[b]||'#6B7A90',deps=(X.deps[b]||[]).slice();if(mem.some(function(p){return !p.don_vi_2}))deps.push('');
-      html+='<section class="uban" style="--bc:'+col+'"><div class="ubh"><h2>'+esc(b||'Unit not recorded')+'</h2><span class="chip">'+mem.length+' people</span>'+(lead&&b?'<span class="ulead" data-pp="'+esc(lead.ho_ten)+'">'+avatar(lead)+'<span><i>Lead</i>'+esc(lead.ho_ten)+'</span></span>':'')+'</div><div class="ugrid">'+
+      html+='<section class="uban" style="--bc:'+col+'"><div class="ubh"><h2>'+esc(b||'Unit not recorded')+'</h2><span class="chip">'+mem.length+' people</span>'+(b?leads.map(function(x,i){return '<span class="ulead'+(i?' u2':'')+'" data-pp="'+esc(x.p.ho_ten)+'">'+avatar(x.p)+'<span><i>'+(x.kn?'Lead · concurrent':'Lead')+'</i>'+esc(x.p.ho_ten)+'</span></span>'}).join(''):'')+'</div><div class="ugrid">'+
         deps.filter(function(d){return !f.u2||d===f.u2}).map(function(d){
           var ps=mem.filter(function(p){return (p.don_vi_2||'')===d});
-          var heads=ps.filter(function(p){return ['Head of dept','Unit lead','Director'].indexOf(p._role)>=0}),rest=ps.filter(function(p){return heads.indexOf(p)<0});
+          var heads=ps.filter(function(p){return ['Head of dept','Unit lead','Director'].indexOf(p._role)>=0}),ext=ps.filter(function(p){return p._ext&&heads.indexOf(p)<0}),rest=ps.filter(function(p){return heads.indexOf(p)<0&&!p._ext});
+          var knh=d?L.filter(function(p){return p._kn.some(function(k){return (k.r==='Head of dept'||k.r==='Deputy head')&&k.u2===d})}):[];
           var by={};rest.forEach(function(p){(by[p._bm]=by[p._bm]||[]).push(p)});
           var bms=DISC.filter(function(x){return by[x]});
           return '<div class="udep" data-drop-b="'+esc(b)+'" data-drop-d="'+esc(d)+'"><div class="udh"><b>'+esc(d||'Directly under unit')+'</b><span class="chip">'+ps.length+'</span></div>'+
             '<div class="ubar">'+bms.map(function(x){return '<i style="flex:'+by[x].length+';background:'+DISC_COLOR[x]+'" title="'+esc(x)+': '+by[x].length+'"></i>'}).join('')+'</div>'+
-            (heads.length?'<div class="uhead">'+heads.map(function(p){return chip(p,anyF,ED)}).join('')+'</div>':(d&&b?'<div class="unohead">No head of department</div>':''))+
-            bms.map(function(x){return '<div class="ubm"><span class="dtag" style="--dc:'+DISC_COLOR[x]+'">'+esc(x)+' · '+by[x].length+'</span>'+by[x].sort(function(a,c){return ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||LEVELS.indexOf(a._lv)-LEVELS.indexOf(c._lv)}).map(function(p){return chip(p,anyF,ED)}).join('')+'</div>'}).join('')+'</div>'}).join('')+
+            (heads.length||knh.length?'<div class="uhead">'+heads.map(function(p){return chip(p,anyF,ED)}).join('')+knh.map(function(p){return chip(p,anyF,false,p._kn.filter(function(k){return k.u2===d})[0])}).join('')+'</div>':(d&&b?'<div class="unohead">No head of department</div>':''))+
+            bms.map(function(x){return '<div class="ubm"><span class="dtag" style="--dc:'+DISC_COLOR[x]+'">'+esc(x)+' · '+by[x].length+'</span>'+by[x].sort(function(a,c){return ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||LEVELS.indexOf(a._lv)-LEVELS.indexOf(c._lv)}).map(function(p){return chip(p,anyF,ED)}).join('')+'</div>'}).join('')+
+            (ext.length?'<div class="ubm uext"><span class="dtag" style="--dc:#6B7A90">Collaborators & interns · '+ext.length+'</span>'+ext.map(function(p){return chip(p,anyF,ED)}).join('')+'</div>':'')+'</div>'}).join('')+
         '</div></section>';
     });
   }
   v.innerHTML=html;
   v.querySelectorAll('#pv button').forEach(function(b){b.onclick=function(){f.view=b.dataset.v;render()}});
   var q=document.getElementById('pq');q.oninput=function(){f.q=q.value;clearTimeout(S.pqT);S.pqT=setTimeout(function(){render();var e=document.getElementById('pq');e.focus();e.setSelectionRange(e.value.length,e.value.length)},250)};
-  [['pu1','u1'],['pu2','u2'],['prl','rl'],['pfd','fd'],['pmg','mg']].forEach(function(x){var e=document.getElementById(x[0]);e.onchange=function(){f[x[1]]=e.value;if(x[1]==='u1')f.u2='';render()}});
+  [['pu1','u1'],['pu2','u2'],['prl','rl'],['pty','ty'],['pfd','fd'],['pmg','mg']].forEach(function(x){var e=document.getElementById(x[0]);e.onchange=function(){f[x[1]]=e.value;if(x[1]==='u1')f.u2='';render()}});
   var c=document.getElementById('pclr');if(c)c.onclick=function(){S.pf={view:f.view};render()};
   var un=document.getElementById('pundo');if(un)un.onclick=undoStaff;
   var ck=v.querySelector('.pchk');if(ck)ck.ontoggle=function(){S.chkOpen=ck.open};
@@ -1338,7 +1357,7 @@ function openPerson(name){
   var byPj={};tasks.forEach(function(t){(byPj[t.ma_da]=byPj[t.ma_da]||[]).push(t)});
   var run=tasks.filter(function(t){return RUN.indexOf(tStatus(t))>=0}).length;
   var auto=function(a){return a?' <span class="muted" style="font-size:11px">(auto)</span>':''};
-  var info=[['Role',esc(p._role)+auto(p._roleAuto)],['Discipline','<span class="dtag" style="--dc:'+DISC_COLOR[p._bm]+'">'+esc(p._bm)+'</span>'+auto(p._bmAuto)],['Title',esc(p.chuc_danh)],['Unit',esc(p.don_vi_1||'—')+(p.don_vi_2?' › '+esc(p.don_vi_2):'')],
+  var info=[['Role',esc(p._role)+auto(p._roleAuto)],['Discipline','<span class="dtag" style="--dc:'+DISC_COLOR[p._bm]+'">'+esc(p._bm)+'</span>'+auto(p._bmAuto)],['Title',esc(p.chuc_danh)],['Concurrent',p._kn.map(function(k){return esc(knText(k))}).join('<br>')],['Type',p._type+(TYPES.indexOf(p.loai_ns)<0?' <span class="muted" style="font-size:11px">(auto)</span>':'')],['Unit',esc(p.don_vi_1||'—')+(p.don_vi_2?' › '+esc(p.don_vi_2):'')],
     ['Email',p.email?'<a href="mailto:'+esc(p.email)+'">'+esc(p.email)+'</a>':''],['Phone',p.sdt?'<a href="tel:'+esc(p.sdt.replace(/\s/g,''))+'">'+esc(p.sdt)+'</a>':''],
     ['Birthday',p.ngay_sinh?dmy(p.ngay_sinh):''],['Joined',p.ngay_vao?dmy(p.ngay_vao):''],['App name',esc(p.ten_goi||'')],['Note',esc(p.ghi_chu||'')]].filter(function(x){return x[1]});
   var dl=function(id,vals){return '<datalist id="'+id+'">'+vals.map(function(x){return '<option value="'+esc(x)+'">'}).join('')+'</datalist>'};
@@ -1348,7 +1367,9 @@ function openPerson(name){
     '<label>Department (Phòng)<input type="text" id="s_don_vi_2" list="dlU2" value="'+esc(p.don_vi_2||'')+'"></label>'+dl('dlU2',allDeps)+
     '<label>Role<select id="s_vai_tro"><option value="">Auto ('+esc(pplRole(p,ks.length))+')</option>'+ROLES.map(function(r){return '<option'+(p.vai_tro===r?' selected':'')+'>'+r+'</option>'}).join('')+'</select></label>'+
     '<label>Discipline<select id="s_bo_mon"><option value="">Auto ('+esc(pplField(p.chuc_danh))+')</option>'+DISC.map(function(r){return '<option'+(p.bo_mon===r?' selected':'')+'>'+r+'</option>'}).join('')+'</select></label>'+
+    '<label>Type<select id="s_loai_ns"><option value="">Auto ('+esc(pplType(Object.assign({},p,{loai_ns:''})))+')</option>'+TYPES.map(function(t){return '<option'+(p.loai_ns===t?' selected':'')+'>'+t+'</option>'}).join('')+'</select></label>'+
     '<label class="full">Title (chức danh)<input type="text" id="s_chuc_danh" value="'+esc(p.chuc_danh||'')+'"></label>'+
+    '<div class="full"><div class="pf" style="margin-bottom:4px"><span>Concurrent positions (kiêm nhiệm)</span></div><div id="knRows"></div><button class="btn sm" id="knAdd" type="button">+ Add position</button></div>'+
     '<label class="full">Direct manager'+(p._mgr&&X.by[p._mgr]._mgr?' <a class="more" id="sUp" style="text-transform:none">↑ Same level as '+esc(p._mgr)+'</a>':'')+'<select id="s_quan_ly"><option value="">— None —</option>'+X.list.filter(function(x){return x.ho_ten!==p.ho_ten}).sort(function(a,b){return a.ho_ten.localeCompare(b.ho_ten,'vi')}).map(function(x){return '<option value="'+esc(x.ho_ten)+'"'+(x.ho_ten===p._mgr?' selected':'')+'>'+esc(x.ho_ten)+' · '+esc(x.chuc_danh)+'</option>'}).join('')+'</select></label>'+
     '<label>Email<input type="text" id="s_email" value="'+esc(p.email||'')+'"></label><label>Phone<input type="text" id="s_sdt" value="'+esc(p.sdt||'')+'"></label>'+
     '<label>Birthday<input type="date" id="s_ngay_sinh" value="'+esc(p.ngay_sinh||'')+'"></label><label>Joined<input type="date" id="s_ngay_vao" value="'+esc(p.ngay_vao||'')+'"></label>'+
@@ -1370,10 +1391,16 @@ function openPerson(name){
   document.getElementById('dx').onclick=closeDrawer;
   d.querySelectorAll('[data-pp]').forEach(function(e){e.onclick=function(){openPerson(e.dataset.pp)}});
   d.querySelectorAll('[data-gopj]').forEach(function(e){e.onclick=function(){closeDrawer();go('du-an',e.dataset.gopj)}});
+  var knBox=document.getElementById('knRows');
+  var knRow=function(k){var r=document.createElement('div');r.className='knr';
+    r.innerHTML='<select class="k_r">'+KN_ROLES.map(function(x){return '<option'+(k.r===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select><input type="text" class="k_u1" list="dlU1" placeholder="Unit" value="'+esc(k.u1||'')+'"><input type="text" class="k_u2" list="dlU2" placeholder="Department" value="'+esc(k.u2||'')+'"><input type="text" class="k_t" placeholder="Note, e.g. Chủ nhiệm dự án" value="'+esc(k.t||'')+'"><button class="btn sm" type="button" title="Remove">×</button>';
+    r.querySelector('button').onclick=function(){r.remove()};knBox.appendChild(r)};
+  if(knBox){p._kn.forEach(knRow);document.getElementById('knAdd').onclick=function(){knRow({r:'Project manager'})}}
   var su=document.getElementById('sUp');if(su)su.onclick=function(ev){ev.preventDefault();document.getElementById('s_quan_ly').value=X.by[p._mgr]._mgr;toast('Manager set to '+X.by[p._mgr]._mgr+' — press Save')};
   var sv=document.getElementById('sSave');
   if(sv)sv.onclick=function(){
-    var patch={};['don_vi_1','don_vi_2','vai_tro','bo_mon','chuc_danh','quan_ly','email','sdt','ngay_sinh','ngay_vao','ten_goi','trang_thai','anh','ghi_chu'].forEach(function(k){var e=document.getElementById('s_'+k);if(!e)return;var val=e.value.trim();if(val!==String(p[k]||''))patch[k]=val});
+    var patch={};['don_vi_1','don_vi_2','vai_tro','bo_mon','loai_ns','chuc_danh','quan_ly','email','sdt','ngay_sinh','ngay_vao','ten_goi','trang_thai','anh','ghi_chu'].forEach(function(k){var e=document.getElementById('s_'+k);if(!e)return;var val=e.value.trim();if(val!==String(p[k]||''))patch[k]=val});
+    if(knBox){var kt=[].map.call(knBox.querySelectorAll('.knr'),function(r){return [r.querySelector('.k_r').value,r.querySelector('.k_u1').value.trim(),r.querySelector('.k_u2').value.trim(),r.querySelector('.k_t').value.trim()].join(' | ').replace(/( \| )+$/,'')}).join('\n');if(kt!==String(p.kiem_nhiem||''))patch.kiem_nhiem=kt}
     if(patch.quan_ly)for(var a=patch.quan_ly;a;a=X.by[a]&&X.by[a]._mgr)if(a===p.ho_ten){toast('Cannot report to someone in their own team');return}
     if(!Object.keys(patch).length){toast('No changes');return}
     sv.disabled=true;sv.textContent='Saving…';
@@ -1384,7 +1411,7 @@ function openPerson(name){
 /* Sơ đồ tổ chức dạng cây từ trên xuống */
 function ocCard(p,X,anyF,ED,open){
   var ks=X.kids[p.ho_ten]||[];
-  return '<div class="occ'+(anyF?(pplMatch(p)?' hit':' dim'):'')+'" data-pp="'+esc(p.ho_ten)+'" data-drop-mgr="'+esc(p.ho_ten)+'"'+(ED?' draggable="true"':'')+' style="--bc:'+(X.banColor[p.don_vi_1]||'#6B7A90')+'">'+
+  return '<div class="occ'+(p._ext?' ext':'')+(anyF?(pplMatch(p)?' hit':' dim'):'')+'" data-pp="'+esc(p.ho_ten)+'" data-drop-mgr="'+esc(p.ho_ten)+'"'+(ED?' draggable="true"':'')+' style="--bc:'+(X.banColor[p.don_vi_1]||'#6B7A90')+'">'+
     avatar(p,'oc')+'<b>'+esc(p.ho_ten)+'</b><span class="ocr">'+esc(p.chuc_danh)+'</span>'+roleBadge(p)+
     '<div class="occf">'+(ED&&p._mgr&&X.by[p._mgr]._mgr?'<button class="oup" data-up="'+esc(p.ho_ten)+'" title="Move up one level">↑</button>':'')+
     (ks.length?'<button class="octg" data-ctg="'+esc(p.ho_ten)+'" data-open="'+(open?1:0)+'">'+(open?'−':'+')+' '+p._team+'</button>':'')+'</div></div>'}
@@ -1404,13 +1431,14 @@ function ocUnits(X,anyF,ED,f){
   var h='<ul class="oc ocunits"><li>'+(root?ocCard(root,X,anyF,false,true):box('Stellar',L.length,'#12233F'))+'<ul>';
   bans.forEach(function(b){
     var mem=L.filter(function(p){return p.don_vi_1===b&&p!==root});if(!mem.length)return;
-    var col=X.banColor[b],lead=mem.filter(function(p){return p._role==='Unit lead'})[0];
+    var col=X.banColor[b],lead=mem.filter(function(p){return p._role==='Unit lead'})[0],klead=L.filter(function(p){return p._kn.some(function(k){return k.r==='Unit lead'&&k.u1===b})});
     var deps=(X.deps[b]||[]).slice();if(mem.some(function(p){return !p.don_vi_2&&p!==lead}))deps.push('');
-    h+='<li>'+box(b,mem.length,col,'ban')+(lead?'<div class="oclead">'+ocCard(lead,X,anyF,ED,false)+'</div>':'')+'<ul>'+
+    h+='<li>'+box(b,mem.length,col,'ban')+(lead||klead.length?'<div class="oclead">'+klead.map(function(p){return '<div class="ockn">'+ocCard(p,X,anyF,false,false)+'</div>'}).join('')+(lead?ocCard(lead,X,anyF,ED,false):'')+'</div>':'')+'<ul>'+
       deps.filter(function(d){return !f.u2||d===f.u2}).map(function(d){
-        var ps=mem.filter(function(p){return (p.don_vi_2||'')===d&&p!==lead}).sort(function(a,c){return ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||DISC.indexOf(a._bm)-DISC.indexOf(c._bm)});
+        var ps=mem.filter(function(p){return (p.don_vi_2||'')===d&&p!==lead}).sort(function(a,c){return (a._ext-c._ext)||ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||DISC.indexOf(a._bm)-DISC.indexOf(c._bm)});
+        var kh=d?L.filter(function(p){return p._kn.some(function(k){return (k.r==='Head of dept'||k.r==='Deputy head')&&k.u2===d})}):[];
         if(!ps.length)return '';
-        return '<li>'+box(d||'Directly under unit',ps.length,col,'dep')+'<div class="ocstack">'+ps.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li>'}).join('')+'</ul></li>';
+        return '<li>'+box(d||'Directly under unit',ps.length,col,'dep')+'<div class="ocstack">'+kh.map(function(p){return '<div class="ockn">'+ocCard(p,X,anyF,false,false)+'</div>'}).join('')+ps.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li>'}).join('')+'</ul></li>';
   });
   var none=L.filter(function(p){return !p.don_vi_1&&p!==root});
   if(none.length&&!f.u1)h+='<li>'+box('Unit not recorded',none.length,'#9AA5B5','ban')+'<ul><li><div class="ocstack">'+none.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li></ul></li>';
