@@ -235,8 +235,9 @@ table.hmt td.hm{min-width:0;max-width:none} table.hmt td,table.hmt th{overflow-w
 .pchip.dim,.onode.dim{opacity:.3}.pchip.hit,.onode.hit{box-shadow:0 0 0 2px var(--accent)}
 .otree,.otree ul{list-style:none;margin:0;padding:0}.otree ul{margin-left:22px;padding-left:16px;border-left:1px dashed var(--line)}
 .otree li{position:relative;padding:4px 0}.otree ul>li:before{content:'';position:absolute;left:-16px;top:22px;width:14px;border-top:1px dashed var(--line)}
-.onode{display:inline-flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border:1px solid var(--line);border-left:4px solid var(--bc);border-radius:10px;background:var(--surface);cursor:pointer;width:340px;max-width:calc(100vw - 80px)}
+.onode{display:inline-flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border:1px solid var(--line);border-left:4px solid var(--bc);border-radius:10px;background:var(--surface);cursor:pointer;width:400px;max-width:calc(100vw - 80px)}
 .onode:hover{box-shadow:0 2px 8px rgba(18,35,63,.12)}.ot{display:flex;flex-direction:column;min-width:0;flex:1}.ot b{font-size:13px}.ot span{font-size:11.5px;color:var(--muted)}
+.oup{border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:12px;font-size:11px;padding:1px 8px;cursor:pointer;white-space:nowrap;margin-right:4px}.oup:hover{background:var(--accent);color:#fff}
 .otg{border:1px solid var(--line);background:var(--sunk);border-radius:12px;font-size:11px;padding:1px 8px;cursor:pointer;font-family:var(--f-mono);white-space:nowrap}
 .pleg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);margin:-6px 0 16px}.pleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .pinfo{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;margin:0 0 14px;font-size:13.5px}.pinfo dt{color:var(--muted);font-size:12px;padding-top:1px}.pinfo dd{margin:0}
@@ -270,6 +271,32 @@ table.hmt td.hm{min-width:0;max-width:none} table.hmt td,table.hmt th{overflow-w
 .mxp i{font-style:normal;font-size:10.5px;color:var(--ink);margin-top:2px;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mxp.lead .av{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}.mxp.dim{opacity:.25}.mxp.hit .av{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--accent)}
 .pform{margin-bottom:12px}
+.ocwrap .hd{flex-wrap:wrap;gap:8px}.ocscroll{overflow:auto;padding:16px 8px 24px;cursor:grab}.ocscroll.pan{cursor:grabbing;user-select:none}.ocz{width:max-content;margin:0 auto}
+.oc,.oc ul{display:flex;justify-content:center;margin:0;padding:0;position:relative}
+.oc ul{padding-top:22px}.oc li{list-style:none;position:relative;padding:22px 6px 0;display:flex;flex-direction:column;align-items:center}
+.oc>li{padding-top:0}
+.oc li::before,.oc li::after{content:'';position:absolute;top:0;right:50%;width:50%;height:22px;border-top:2px solid #B7C3D4}
+.oc li::after{right:auto;left:50%;border-left:2px solid #B7C3D4}
+.oc li:only-child::before,.oc li:only-child::after{display:none}.oc li:only-child{padding-top:22px}.oc>li:only-child{padding-top:0}
+.oc li:first-child::before,.oc li:last-child::after{border:0 none}
+.oc li:last-child::before{border-right:2px solid #B7C3D4;border-radius:0 8px 0 0}.oc li:first-child::after{border-radius:8px 0 0 0}
+.oc ul::before{content:'';position:absolute;top:0;left:50%;height:22px;border-left:2px solid #B7C3D4}
+.oc li:only-child::after{display:block;border:0;border-left:2px solid #B7C3D4;width:0;left:50%;height:22px}
+.oc>li:only-child::after{display:none}
+.occ{position:relative;width:168px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--bc);border-radius:10px;padding:10px 8px 8px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 1px 3px rgba(18,35,63,.08)}
+.occ:hover{box-shadow:0 4px 12px rgba(18,35,63,.16)}.occ b{font-size:12.5px;line-height:1.25}.occ .ocr{font-size:10.5px;color:var(--muted);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.occ .rb{margin:2px 0 0}.av.oc{width:40px;height:40px;font-size:17px;margin-bottom:3px;box-shadow:0 0 0 3px #fff,0 0 0 4px var(--bc)}
+.occf{display:flex;gap:4px;margin-top:4px}.octg{border:1px solid var(--line);background:var(--sunk);border-radius:10px;font-size:10.5px;padding:0 7px;cursor:pointer;font-family:var(--f-mono)}
+.occ.dim{opacity:.25}.occ.hit{box-shadow:0 0 0 3px var(--accent)}
+.ocstack{display:flex;flex-direction:column;gap:6px;position:relative;padding-left:14px;border-left:2px solid #B7C3D4;margin-left:2px}
+.ocstack .occ{flex-direction:row;text-align:left;width:200px;padding:6px 8px;gap:8px;border-top:1px solid var(--line);border-left:4px solid var(--bc);display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto}
+.ocstack .occ .av{grid-row:1/4;width:30px;height:30px;font-size:13px;margin:0;box-shadow:none}.ocstack .occ b,.ocstack .occ .ocr,.ocstack .occ .rb,.ocstack .occ .occf{grid-column:2;justify-self:start}.ocstack .occ .occf{margin-top:0}.ocstack .occ:empty{display:none}
+.ocstack .occ::before{content:'';position:absolute;left:-16px;top:50%;width:12px;border-top:2px solid #B7C3D4}
+li.lf{padding-top:22px}
+.ocu{min-width:170px;max-width:220px;padding:10px 12px;border-radius:10px;background:var(--bc);color:#fff;text-align:center}.ocu b{display:block;font-size:13px}.ocu span{font-size:11px;opacity:.85}
+.ocu.dep{background:color-mix(in srgb,var(--bc) 14%,#fff);color:var(--ink);border:1px solid color-mix(in srgb,var(--bc) 40%,transparent);margin-bottom:8px}
+.oclead{margin-top:8px}.ocunits .octg{display:none}
+@media print{header,.pfbar,#pv,.hint,.pchk,.foot,.ocwrap .hd,.pleg,.toast,.banner{display:none!important}body{background:#fff}.ocscroll{overflow:visible}.panel{border:0;box-shadow:none}}
 .foot{text-align:center;font-size:12px;color:var(--muted);padding:18px 16px 28px;border-top:1px solid var(--line);margin-top:24px}
 body:has(.qsend) .foot{padding-bottom:90px}
 .cp{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px;font-size:13px;line-height:1;opacity:.55;vertical-align:baseline}.cp:hover{opacity:1;color:var(--accent)}
@@ -1209,13 +1236,13 @@ function vPeople(v){
   var u2s=[];(f.u1?[f.u1]:X.bans).forEach(function(b){(X.deps[b]||[]).forEach(function(d){if(u2s.indexOf(d)<0)u2s.push(d)})});
   var mgrs=Object.keys(X.kids).filter(function(k){return k}).sort(function(a,b){return a.localeCompare(b,'vi')});
   var html='<div class="row" style="justify-content:space-between"><div><div class="eyebrow">'+L.length+' people · '+X.bans.length+' units · '+Object.keys(X.deps).reduce(function(s,b){return s+X.deps[b].length},0)+' departments</div><h1>People</h1></div>'+
-    '<div class="seg" id="pv">'+[['units','Units'],['matrix','Matrix'],['org','Org chart'],['list','List']].map(function(x){return '<button data-v="'+x[0]+'" class="'+(f.view===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div>';
+    '<div class="seg" id="pv">'+[['units','Units'],['chart','Chart'],['matrix','Matrix'],['org','Tree'],['list','List']].map(function(x){return '<button data-v="'+x[0]+'" class="'+(f.view===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div>';
   html+='<div class="pfbar"><label class="pf grow"><span>Search</span><input id="pq" type="search" placeholder="Name, title, email…" value="'+esc(f.q||'')+'"></label>'+
     opt('pu1','Unit',X.bans,f.u1)+opt('pu2','Department',u2s,f.u2)+opt('prl','Role',ROLES.filter(function(r){return L.some(function(p){return p._role===r})}),f.rl)+
     opt('pfd','Discipline',DISC.filter(function(d){return L.some(function(p){return p._bm===d})}),f.fd)+opt('pmg','Manager',mgrs,f.mg)+
     (anyF?'<button class="btn sm" id="pclr">Clear · '+hits.length+'</button>':'')+'</div>';
   if(ED){
-    html+='<div class="hint pedit"><b>Edit mode.</b> '+(f.view==='units'?'Drag a person onto another department to move them. ':f.view==='matrix'?'Drag a person to another cell to change department and discipline. ':f.view==='org'?'Drag a person onto another person to change their manager. ':'')+'Click a person to edit all fields.'+
+    html+='<div class="hint pedit"><b>Edit mode.</b> '+(f.view==='units'?'Drag a person onto another department to move them. ':f.view==='matrix'?'Drag a person to another cell to change department and discipline. ':f.view==='org'||f.view==='chart'?'Drag a person onto their new manager, or press ↑ Up to move a person (and their team) up one level. ':'')+'Click a person to edit all fields.'+
       (S.undo?' <button class="btn sm" id="pundo">↶ Undo: '+esc(S.undo.msg||'last change')+'</button>':'')+'</div>';
     var iss=X.issues,kinds={};iss.forEach(function(i){(kinds[i.kind]=kinds[i.kind]||[]).push(i)});
     html+='<details class="panel pchk"'+(S.chkOpen?' open':'')+'><summary><b>Data check</b> · '+iss.length+' items to review</summary><div class="bd">'+
@@ -1226,11 +1253,13 @@ function vPeople(v){
     html+='<section class="panel"><div class="scroll"><table class="ptab"><thead><tr><th>Name</th><th>Role</th><th>Title</th><th>Discipline</th><th>Unit / Department</th><th>Manager</th><th>Email</th><th>Phone</th>'+(ad?'<th>Birthday</th>':'')+'</tr></thead><tbody>'+
       hits.map(function(p){return '<tr class="click" data-pp="'+esc(p.ho_ten)+'"><td><div class="pname">'+avatar(p)+'<b>'+esc(p.ho_ten)+'</b></div></td><td>'+esc(p._role)+'</td><td>'+esc(p.chuc_danh)+'</td><td><span class="dtag" style="--dc:'+DISC_COLOR[p._bm]+'">'+esc(p._bm)+'</span></td><td>'+esc(p.don_vi_1||'—')+(p.don_vi_2?'<div class="muted" style="font-size:12px">'+esc(p.don_vi_2)+'</div>':'')+'</td><td>'+esc(p.quan_ly)+'</td><td class="mono" style="font-size:12px">'+esc(p.email)+'</td><td class="mono" style="font-size:12px;white-space:nowrap">'+esc(p.sdt)+'</td>'+(ad?'<td class="mono" style="font-size:12px">'+(p.ngay_sinh?dmy(p.ngay_sinh):'')+'</td>':'')+'</tr>'}).join('')+
       '</tbody></table></div>'+(hits.length?'':'<div class="empty">No one matches these filters.</div>')+'</section>';
+  }else if(f.view==='chart'){
+    html+=chartHtml(X,anyF,ED,f);
   }else if(f.view==='org'){
     var roots=X.kids['']||[],open=S.pOpen=S.pOpen||{};
     var node=function(p,d){var ks=X.kids[p.ho_ten]||[],isOpen=open[p.ho_ten]!==undefined?open[p.ho_ten]:d<2,m=pplMatch(p);
       return '<li><div class="onode'+(anyF?(m?' hit':' dim'):'')+'" data-pp="'+esc(p.ho_ten)+'" data-drop-mgr="'+esc(p.ho_ten)+'"'+(ED?' draggable="true"':'')+' style="--bc:'+(X.banColor[p.don_vi_1]||'#6B7A90')+'">'+avatar(p)+'<div class="ot"><b>'+esc(p.ho_ten)+roleBadge(p)+'</b><span>'+esc(p.chuc_danh)+'</span></div>'+
-        (ks.length?'<button class="otg" data-open="'+(isOpen?1:0)+'" data-tg="'+esc(p.ho_ten)+'" title="'+(isOpen?'Collapse':'Expand')+'">'+(isOpen?'−':'+')+' '+p._team+'</button>':'')+'</div>'+
+        (ED&&p._mgr&&X.by[p._mgr]._mgr?'<button class="oup" data-up="'+esc(p.ho_ten)+'" title="Move up one level: report to '+esc(X.by[p._mgr]._mgr)+' (same level as '+esc(p._mgr)+')">↑ Up</button>':'')+(ks.length?'<button class="otg" data-open="'+(isOpen?1:0)+'" data-tg="'+esc(p.ho_ten)+'" title="'+(isOpen?'Collapse':'Expand')+'">'+(isOpen?'−':'+')+' '+p._team+'</button>':'')+'</div>'+
         (ks.length&&isOpen?'<ul>'+ks.map(function(k){return node(k,d+1)}).join('')+'</ul>':'')+'</li>'};
     html+='<section class="panel"><div class="hd"><h2>Reporting lines</h2><span class="sp"></span><button class="btn sm" id="oAll">Expand all</button><button class="btn sm" id="oNone">Collapse</button></div><div class="bd scroll"><ul class="otree">'+roots.map(function(r){return node(r,0)}).join('')+'</ul></div></section>';
     html+='<div class="pleg">'+X.bans.map(function(b){return '<span><i style="background:'+X.banColor[b]+'"></i>'+esc(b)+'</span>'}).join('')+'</div>';
@@ -1275,8 +1304,11 @@ function vPeople(v){
   v.querySelectorAll('.otg').forEach(function(b){b.onclick=function(ev){ev.stopPropagation();S.pOpen[b.dataset.tg]=b.dataset.open!=='1';render()}});
   var oa=document.getElementById('oAll');if(oa)oa.onclick=function(){L.forEach(function(p){S.pOpen[p.ho_ten]=true});render()};
   var on=document.getElementById('oNone');if(on)on.onclick=function(){L.forEach(function(p){S.pOpen[p.ho_ten]=false});render()};
+  v.querySelectorAll('.oup').forEach(function(b){b.onclick=function(ev){ev.stopPropagation();var p=X.by[b.dataset.up],g=X.by[p._mgr]._mgr;saveStaff(p,{quan_ly:g},given(p.ho_ten)+' now reports to '+g+' (same level as '+p._mgr+')').catch(err)}});
+  if(f.view==='chart')bindChart(v,X);
   if(ED)bindStaffDrag(v);
 }
+if(!window.__dragScroll){window.__dragScroll=1;document.addEventListener('dragover',function(e){var m=90,sp=0;if(e.clientY<m)sp=-Math.ceil((m-e.clientY)/3);else if(e.clientY>innerHeight-m)sp=Math.ceil((e.clientY-innerHeight+m)/3);if(sp)window.scrollBy(0,sp)})}
 function bindStaffDrag(v){
   var X=S.ppl,drag=null;
   v.querySelectorAll('[draggable="true"][data-pp]').forEach(function(e){
@@ -1317,7 +1349,7 @@ function openPerson(name){
     '<label>Role<select id="s_vai_tro"><option value="">Auto ('+esc(pplRole(p,ks.length))+')</option>'+ROLES.map(function(r){return '<option'+(p.vai_tro===r?' selected':'')+'>'+r+'</option>'}).join('')+'</select></label>'+
     '<label>Discipline<select id="s_bo_mon"><option value="">Auto ('+esc(pplField(p.chuc_danh))+')</option>'+DISC.map(function(r){return '<option'+(p.bo_mon===r?' selected':'')+'>'+r+'</option>'}).join('')+'</select></label>'+
     '<label class="full">Title (chức danh)<input type="text" id="s_chuc_danh" value="'+esc(p.chuc_danh||'')+'"></label>'+
-    '<label class="full">Direct manager<select id="s_quan_ly"><option value="">— None —</option>'+X.list.filter(function(x){return x.ho_ten!==p.ho_ten}).sort(function(a,b){return a.ho_ten.localeCompare(b.ho_ten,'vi')}).map(function(x){return '<option value="'+esc(x.ho_ten)+'"'+(x.ho_ten===p._mgr?' selected':'')+'>'+esc(x.ho_ten)+' · '+esc(x.chuc_danh)+'</option>'}).join('')+'</select></label>'+
+    '<label class="full">Direct manager'+(p._mgr&&X.by[p._mgr]._mgr?' <a class="more" id="sUp" style="text-transform:none">↑ Same level as '+esc(p._mgr)+'</a>':'')+'<select id="s_quan_ly"><option value="">— None —</option>'+X.list.filter(function(x){return x.ho_ten!==p.ho_ten}).sort(function(a,b){return a.ho_ten.localeCompare(b.ho_ten,'vi')}).map(function(x){return '<option value="'+esc(x.ho_ten)+'"'+(x.ho_ten===p._mgr?' selected':'')+'>'+esc(x.ho_ten)+' · '+esc(x.chuc_danh)+'</option>'}).join('')+'</select></label>'+
     '<label>Email<input type="text" id="s_email" value="'+esc(p.email||'')+'"></label><label>Phone<input type="text" id="s_sdt" value="'+esc(p.sdt||'')+'"></label>'+
     '<label>Birthday<input type="date" id="s_ngay_sinh" value="'+esc(p.ngay_sinh||'')+'"></label><label>Joined<input type="date" id="s_ngay_vao" value="'+esc(p.ngay_vao||'')+'"></label>'+
     '<label>App name<input type="text" id="s_ten_goi" value="'+esc(p.ten_goi||'')+'"></label><label>Status<select id="s_trang_thai">'+['Đang làm','Nghỉ việc'].map(function(x){return '<option'+((p.trang_thai||'Đang làm')===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></label>'+
@@ -1338,6 +1370,7 @@ function openPerson(name){
   document.getElementById('dx').onclick=closeDrawer;
   d.querySelectorAll('[data-pp]').forEach(function(e){e.onclick=function(){openPerson(e.dataset.pp)}});
   d.querySelectorAll('[data-gopj]').forEach(function(e){e.onclick=function(){closeDrawer();go('du-an',e.dataset.gopj)}});
+  var su=document.getElementById('sUp');if(su)su.onclick=function(ev){ev.preventDefault();document.getElementById('s_quan_ly').value=X.by[p._mgr]._mgr;toast('Manager set to '+X.by[p._mgr]._mgr+' — press Save')};
   var sv=document.getElementById('sSave');
   if(sv)sv.onclick=function(){
     var patch={};['don_vi_1','don_vi_2','vai_tro','bo_mon','chuc_danh','quan_ly','email','sdt','ngay_sinh','ngay_vao','ten_goi','trang_thai','anh','ghi_chu'].forEach(function(k){var e=document.getElementById('s_'+k);if(!e)return;var val=e.value.trim();if(val!==String(p[k]||''))patch[k]=val});
@@ -1346,6 +1379,66 @@ function openPerson(name){
     sv.disabled=true;sv.textContent='Saving…';
     saveStaff(p,patch,'Updated '+p.ho_ten).then(function(){if(patch.trang_thai==='Nghỉ việc'){S.ppl=pplIndex(S.ppl.list.filter(function(x){return x.trang_thai!=='Nghỉ việc'}));render();closeDrawer()}else openPerson(p.ho_ten)}).catch(function(e){sv.disabled=false;sv.textContent='Save';err(e)});
   };
+}
+
+/* Sơ đồ tổ chức dạng cây từ trên xuống */
+function ocCard(p,X,anyF,ED,open){
+  var ks=X.kids[p.ho_ten]||[];
+  return '<div class="occ'+(anyF?(pplMatch(p)?' hit':' dim'):'')+'" data-pp="'+esc(p.ho_ten)+'" data-drop-mgr="'+esc(p.ho_ten)+'"'+(ED?' draggable="true"':'')+' style="--bc:'+(X.banColor[p.don_vi_1]||'#6B7A90')+'">'+
+    avatar(p,'oc')+'<b>'+esc(p.ho_ten)+'</b><span class="ocr">'+esc(p.chuc_danh)+'</span>'+roleBadge(p)+
+    '<div class="occf">'+(ED&&p._mgr&&X.by[p._mgr]._mgr?'<button class="oup" data-up="'+esc(p.ho_ten)+'" title="Move up one level">↑</button>':'')+
+    (ks.length?'<button class="octg" data-ctg="'+esc(p.ho_ten)+'" data-open="'+(open?1:0)+'">'+(open?'−':'+')+' '+p._team+'</button>':'')+'</div></div>'}
+function ocBranch(p,X,anyF,ED){
+  var ks=X.kids[p.ho_ten]||[],open=S.cOpen[p.ho_ten]!==undefined?S.cOpen[p.ho_ten]:true;
+  var h='<li>'+ocCard(p,X,anyF,ED,open);
+  if(ks.length&&open){
+    var leaves=ks.filter(function(k){return !(X.kids[k.ho_ten]||[]).length}),br=ks.filter(function(k){return (X.kids[k.ho_ten]||[]).length});
+    h+='<ul>'+(leaves.length?'<li class="lf"><div class="ocstack">'+leaves.map(function(k){return ocCard(k,X,anyF,ED,false)}).join('')+'</div></li>':'')+
+      br.map(function(k){return ocBranch(k,X,anyF,ED)}).join('')+'</ul>';
+  }
+  return h+'</li>'}
+function ocUnits(X,anyF,ED,f){
+  var L=X.list,bans=(f.u1?[f.u1]:X.bans);
+  var root=L.filter(function(p){return p._role==='Director'})[0];
+  var box=function(t,n,col,cls){return '<div class="ocu '+(cls||'')+'" style="--bc:'+col+'"><b>'+esc(t)+'</b><span>'+n+' people</span></div>'};
+  var h='<ul class="oc ocunits"><li>'+(root?ocCard(root,X,anyF,false,true):box('Stellar',L.length,'#12233F'))+'<ul>';
+  bans.forEach(function(b){
+    var mem=L.filter(function(p){return p.don_vi_1===b&&p!==root});if(!mem.length)return;
+    var col=X.banColor[b],lead=mem.filter(function(p){return p._role==='Unit lead'})[0];
+    var deps=(X.deps[b]||[]).slice();if(mem.some(function(p){return !p.don_vi_2&&p!==lead}))deps.push('');
+    h+='<li>'+box(b,mem.length,col,'ban')+(lead?'<div class="oclead">'+ocCard(lead,X,anyF,ED,false)+'</div>':'')+'<ul>'+
+      deps.filter(function(d){return !f.u2||d===f.u2}).map(function(d){
+        var ps=mem.filter(function(p){return (p.don_vi_2||'')===d&&p!==lead}).sort(function(a,c){return ROLES.indexOf(a._role)-ROLES.indexOf(c._role)||DISC.indexOf(a._bm)-DISC.indexOf(c._bm)});
+        if(!ps.length)return '';
+        return '<li>'+box(d||'Directly under unit',ps.length,col,'dep')+'<div class="ocstack">'+ps.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li>'}).join('')+'</ul></li>';
+  });
+  var none=L.filter(function(p){return !p.don_vi_1&&p!==root});
+  if(none.length&&!f.u1)h+='<li>'+box('Unit not recorded',none.length,'#9AA5B5','ban')+'<ul><li><div class="ocstack">'+none.map(function(p){return ocCard(p,X,anyF,ED,false)}).join('')+'</div></li></ul></li>';
+  return h+'</ul></li></ul>'}
+function chartHtml(X,anyF,ED,f){
+  S.cOpen=S.cOpen||{};var mode=f.cm||'lines';
+  var body=mode==='units'?ocUnits(X,anyF,ED,f):'<ul class="oc">'+(X.kids['']||[]).map(function(r){return ocBranch(r,X,anyF,ED)}).join('')+'</ul>';
+  return '<section class="panel ocwrap"><div class="hd"><div class="seg" id="cm">'+[['lines','Reporting lines'],['units','By unit']].map(function(x){return '<button data-m="'+x[0]+'" class="'+(mode===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div><span class="sp"></span>'+
+    '<div class="seg"><button id="czo" title="Zoom out">−</button><button id="czf">Fit</button><button id="czi" title="Zoom in">+</button></div>'+(mode==='lines'?'<button class="btn sm" id="cAll">Expand all</button>':'')+'<button class="btn sm" id="cPrint">Print / PDF</button></div>'+
+    '<div class="ocscroll" id="ocs"><div class="ocz" id="ocz">'+body+'</div></div></section>'+
+    '<div class="pleg">'+X.bans.map(function(b){return '<span><i style="background:'+X.banColor[b]+'"></i>'+esc(b)+'</span>'}).join('')+'</div>'}
+function bindChart(v,X){
+  var z=document.getElementById('ocz'),sc=document.getElementById('ocs');if(!z)return;
+  var setZ=function(k){S.cz=Math.max(.3,Math.min(1.4,k));z.style.zoom=S.cz};
+  var fit=function(){z.style.zoom=1;var w=z.scrollWidth;setZ(w?Math.min(1,(sc.clientWidth-8)/w):1)};
+  if(S.cz)setZ(S.cz);else fit();
+  sc.scrollLeft=(sc.scrollWidth-sc.clientWidth)/2;
+  document.getElementById('czo').onclick=function(){setZ((S.cz||1)-.1)};
+  document.getElementById('czi').onclick=function(){setZ((S.cz||1)+.1)};
+  document.getElementById('czf').onclick=fit;
+  v.querySelectorAll('#cm button').forEach(function(b){b.onclick=function(){S.pf.cm=b.dataset.m;S.cz=0;render()}});
+  var ca=document.getElementById('cAll');if(ca)ca.onclick=function(){S.cOpen={};S.cz=0;render()};
+  document.getElementById('cPrint').onclick=function(){window.print()};
+  v.querySelectorAll('.octg').forEach(function(b){b.onclick=function(ev){ev.stopPropagation();S.cOpen[b.dataset.ctg]=b.dataset.open!=='1';render()}});
+  /* kéo để cuộn ngang/dọc khi không ở chế độ sửa */
+  if(!adm()){var down=null;sc.onmousedown=function(e){if(e.target.closest('.occ,button'))return;down={x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:window.scrollY};sc.classList.add('pan')};
+    window.onmousemove=function(e){if(!down)return;sc.scrollLeft=down.l-(e.clientX-down.x);window.scrollTo(0,down.t-(e.clientY-down.y))};
+    window.onmouseup=function(){down=null;sc.classList.remove('pan')}}
 }
 
 /* ================= TRA CỨU ================= */
