@@ -348,6 +348,41 @@ mark{background:var(--warn-soft);color:inherit;border-radius:2px}
 .loading{padding:60px 0;text-align:center;color:var(--muted)}
 @media (max-width:640px){h1{font-size:19px}.kpi .v{font-size:22px}.brand span{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* =====================================================================
+   STELLAR FLAT UI v1 (14/11/2026) — bộ quy tắc giao diện dùng chung App QH + QLDA
+   Nền xám nhạt, card trắng viền mỏng, không đổ bóng (trừ lớp nổi: modal, dropdown, ngăn kéo);
+   header navy đặc; mỗi khu vực một nút chính. Chỉ đổi phần trình bày.
+   Muốn quay lại giao diện cũ: xóa nguyên khối này.
+   ===================================================================== */
+:root{--r:8px;--r-card:10px}
+header.top{box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.panel,.kpi{border-radius:var(--r-card)}
+.panel>.hd{background:var(--surface);border-radius:var(--r-card) var(--r-card) 0 0}
+th{background:var(--sunk)}
+.btn{min-height:32px}
+.btn:hover{border-color:var(--muted)}
+.btn.pri:hover{background:var(--navy);border-color:var(--navy)}
+/* Tên dự án: chữ đậm, không ô navy */
+.pn{padding:0;background:none;color:var(--ink);font-weight:700;border-radius:0}
+.bcard .bh .pn{color:#fff}
+/* Nút phân đoạn: phẳng */
+.seg button.on{box-shadow:none;outline:1px solid var(--line)}
+/* TAG dự án: vạch màu bên trái thay vì tô cả dòng/thẻ */
+table tr[class*="tg-"]>td,table.stick tr[class*="tg-"]>td:first-child,table.stick2 tr[class*="tg-"]>td:nth-child(2){background:var(--surface)}
+table tr[class*="tg-"]:hover>td{background:var(--sunk)}
+table tr.tg-Xanh>td:first-child{box-shadow:inset 4px 0 0 var(--good)}
+table tr.tg-Vàng>td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
+table tr.tg-Đỏ>td:first-child{box-shadow:inset 4px 0 0 var(--crit)}
+table tr.tg-Xám>td:first-child{box-shadow:inset 4px 0 0 var(--idle)}
+.bcard[class*="tg-"]{background:var(--surface);border-color:var(--line);border-left-width:4px}
+.bcard.tg-Xanh{border-left-color:var(--good)}.bcard.tg-Vàng{border-left-color:var(--warn)}
+.bcard.tg-Đỏ{border-left-color:var(--crit)}.bcard.tg-Xám{border-left-color:var(--idle)}
+/* Hover: đổi viền, không nổi bóng (bóng chỉ cho lớp nổi) */
+.onode:hover,.occ:hover{box-shadow:none;border-color:#B8C3D0}
+.pchip:hover{box-shadow:none;outline:1px solid var(--line)}
+.qsend{box-shadow:none}
+/* ===================== hết STELLAR FLAT UI v1 ===================== */
 </style>
 
 <div id="root"><div class="loading">Loading…</div></div>
