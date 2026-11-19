@@ -339,7 +339,8 @@ body:has(.qsend) .foot{padding-bottom:90px}
 .erow a.act{color:var(--accent);cursor:pointer;font-size:12px}.erow a.act.del{color:var(--crit)}
 .erow input[type=text],.erow select,.erow input[type=date]{width:100%;padding:5px 7px;font-size:12.5px}
 .erow select{min-width:110px}.erow input[type=date]{min-width:130px}
-.enote{min-width:260px}.enote input[type=date]{width:auto;margin-bottom:4px}.enote textarea{min-height:48px;font-size:12.5px}
+.enote{min-width:260px}.enold,.enedit{border-left:3px solid var(--line);padding:4px 8px;margin-bottom:6px;background:var(--sunk);border-radius:0 6px 6px 0}.enold.cur{border-left-color:var(--accent)}.enold.ok{border-left-color:var(--good)}
+.enlbl{font-size:11.5px;color:var(--muted);margin-bottom:3px}.enlbl .act{margin-left:6px}.ent{font-size:12.5px;white-space:pre-wrap;line-height:1.4}.enedit{border-left-color:#F2B33D;background:#FFF8E8}.enote input[type=date]{width:auto;margin-bottom:4px}.enote textarea{min-height:48px;font-size:12.5px}
 .erow .ok{border-color:var(--good)!important;box-shadow:0 0 0 2px var(--good-soft)}
 .erow .err{border-color:var(--crit)!important}
 .login{max-width:380px;margin:60px auto;display:flex;flex-direction:column;gap:12px}
@@ -735,7 +736,7 @@ function vProject(v){
       if(ex)cur=ex;else{cur={code:t.nhom,head:t.cap==='nhom'?t:null,name:t.ten_nhom,items:[]};groups.push(cur);if(!gmap[t.nhom])gmap[t.nhom]=cur}}
     if(t.cap==='hangmuc')cur.items.push(t)});
   var EDIT=adm();
-  html+='<section class="panel"><div class="hd"><h2>Hạng mục theo nhóm</h2><span class="sp muted" style="font-size:12px">'+(EDIT?'Sửa trực tiếp trong bảng, mỗi ô tự lưu khi rời ô':'Bấm một hạng mục để xem lịch sử và cập nhật')+'</span>'+'</div>';
+  html+='<section class="panel"><div class="hd"><h2>Hạng mục theo nhóm</h2><span class="sp muted" style="font-size:12px">'+(EDIT?'Sửa trực tiếp trong bảng, mỗi ô tự lưu khi rời ô. Latest note: gõ vào “Cập nhật mới” để thêm, ghi chú cũ giữ nguyên; bấm ✎ Sửa nếu cần sửa ghi chú cũ':'Bấm một hạng mục để xem lịch sử và cập nhật')+'</span>'+'</div>';
   groups.forEach(function(g){
     var all=g.items.concat(g.head?[g.head]:[]),nWeek=0,last='';
     all.forEach(function(t){(IX.notesByTask[t.id]||[]).forEach(function(n){if(n.tuan===w)nWeek++;if(n.tuan<=w&&n.tuan>last)last=n.tuan})});
@@ -789,8 +790,15 @@ function editRow(t,n){
     '<td><select data-f="nguoi_pt">'+opt(IX.people,t.nguoi_pt)+'</select></td>'+
     '<td><input type="date" data-f="deadline_cdt" value="'+esc(t.deadline_cdt)+'"></td>'+
     '<td>'+(hm?'<select data-f="trang_thai">'+opt(dmL.trang_thai_hm,t.trang_thai)+'</select>':'')+'</td>'+
-    '<td class="enote">'+(n?'<input type="date" data-nf="tuan" data-n="'+esc(n.id)+'" value="'+esc(n.tuan)+'" title="Thông tin của ngày (lưu theo tuần chứa ngày này)"><textarea rows="2" data-nf="noi_dung" data-n="'+esc(n.id)+'">'+esc(n.noi_dung)+'</textarea>':
-      '<input type="date" data-new="tuan" value="'+(TODAY>=S.week&&TODAY<=add(S.week,6)?TODAY:S.week)+'"><textarea rows="2" data-new="noi_dung" placeholder="Thêm ghi chú…"></textarea>')+'</td></tr>';
+    '<td class="enote">'+noteCell(n)+'</td></tr>';
+}
+/* Ô ghi chú: ghi chú cũ chỉ đọc + ô cập nhật mới. Muốn sửa ghi chú cũ phải bấm "Sửa" */
+function latestNote(id){return (IX.notesByTask[id]||[]).filter(function(n){return n.tuan<=S.week}).sort(function(a,b){return a.tuan<b.tuan?1:(a.tuan>b.tuan?-1:(String(a.thoi_diem)<String(b.thoi_diem)?1:-1))})[0]}
+function noteCell(n,editOld){
+  var day=TODAY>=S.week&&TODAY<=add(S.week,6)?TODAY:S.week;
+  var old=n?(editOld?'<div class="enedit"><div class="enlbl">Sửa ghi chú tuần '+weekNo(n.tuan)+' <a class="act" data-canceln="1">Xong</a></div><input type="date" data-nf="tuan" data-n="'+esc(n.id)+'" value="'+esc(n.tuan)+'" title="Thông tin của ngày (lưu theo tuần chứa ngày này)"><textarea rows="3" data-nf="noi_dung" data-n="'+esc(n.id)+'">'+esc(n.noi_dung)+'</textarea></div>':
+    '<div class="enold'+(n.tuan===S.week?' cur':'')+'"><div class="enlbl"><span class="mono">'+dm(n.tuan)+'</span> · '+(n.tuan===S.week?'tuần này':'tuần '+weekNo(n.tuan))+(canNote(n)||adm()?' <a class="act" data-editn="'+esc(n.id)+'">✎ Sửa</a>':'')+'</div><div class="ent">'+esc(short(n.noi_dung,260))+'</div></div>'):'';
+  return old+(editOld?'':'<div class="ennew"><div class="enlbl">+ Cập nhật mới</div><input type="date" data-new="tuan" value="'+day+'" title="Thông tin của ngày"><textarea rows="2" data-new="noi_dung" placeholder="Cập nhật tuần '+weekNo(S.week)+'…"></textarea></div>');
 }
 function saved(el){el.classList.remove('err');el.classList.add('ok');setTimeout(function(){el.classList.remove('ok')},1200)}
 function bindEdit(v){
@@ -812,8 +820,10 @@ function bindEdit(v){
       var txt=nt.value.trim();if(!txt)return;
       var day=tr.querySelector('[data-new="tuan"]').value||S.week;nt.disabled=true;
       api.addNote({ma_da:t.ma_da,cv_id:id,tuan:mon(day),loai:'Đã làm',loai_vm:'',noi_dung:txt}).then(function(r){S.data.BaoCaoTuan.push(r);index();
-        nt.disabled=false;nt.dataset.new='';nt.dataset.nf='noi_dung';nt.dataset.n=r.id;var dd=tr.querySelector('[data-new="tuan"]');dd.dataset.new='';dd.dataset.nf='tuan';dd.dataset.n=r.id;dd.value=r.tuan;saved(nt);bindEdit(v)}).catch(function(e){nt.disabled=false;err(e)});
+        var cell=tr.querySelector('td.enote');cell.innerHTML=noteCell(latestNote(id));bindEdit(v);var o=cell.querySelector('.enold');if(o)saved(o);toast('Đã thêm cập nhật, ghi chú cũ vẫn giữ trong Lịch sử')}).catch(function(e){nt.disabled=false;err(e)});
     };
+    var en=tr.querySelector('[data-editn]');if(en)en.onclick=function(){var cell=tr.querySelector('td.enote');cell.innerHTML=noteCell(latestNote(id),true);bindEdit(v);var ta=cell.querySelector('textarea');if(ta)ta.focus()};
+    var cn=tr.querySelector('[data-canceln]');if(cn)cn.onclick=function(){var cell=tr.querySelector('td.enote');cell.innerHTML=noteCell(latestNote(id));bindEdit(v)};
     var del=tr.querySelector('[data-del]');
     if(del)del.onclick=function(){
       if(!del.dataset.ok){del.dataset.ok='1';del.textContent='Bấm lần nữa';return}
