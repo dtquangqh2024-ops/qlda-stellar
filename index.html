@@ -153,6 +153,14 @@ textarea{width:100%;resize:vertical;min-height:64px;line-height:1.45}
 .seg button{border:0;background:transparent;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted)}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.pjbar{position:sticky;top:var(--hdr,0px);z-index:15;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--lc);border-radius:10px;padding:6px 10px;margin:0 0 10px;box-shadow:0 0 0 6px var(--bg)}
+.pjback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;font-size:20px;line-height:1;color:var(--ink);cursor:pointer;text-decoration:none}.pjback:hover{border-color:var(--accent);color:var(--accent)}
+.pjt{min-width:0;flex:1}.pjt h1{font-size:18px;line-height:1.2;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pjm{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden}.pjm span:last-child{overflow:hidden;text-overflow:ellipsis}.pjm .lchip{font-size:10px;padding:0 6px}
+.pjmoc{flex:none;display:flex;gap:6px}.pjmoc>div{background:var(--sunk);border-radius:8px;padding:3px 10px;min-width:92px}.pjmoc span{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap}.pjmoc b{display:block;font-family:var(--f-mono);font-size:12.5px}
+.pjmoc .soon{background:var(--warn-soft)}.pjmoc .past b{color:var(--muted)}
+.phead .info:empty{display:none}
+@media (max-width:760px){.pjbar{flex-wrap:wrap;gap:6px 8px}.pjmoc{width:100%}.pjmoc>div{flex:1;min-width:0;padding:2px 6px}.pjmoc span{font-size:9.5px;overflow:hidden;text-overflow:ellipsis}.pjmoc b{font-size:11.5px}}
 .phead{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
 .phead .info{flex:1;min-width:240px;display:flex;flex-direction:column;gap:6px}
 .moc{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
@@ -586,6 +594,8 @@ var LNAME={UNI:'Pristie'};function lname(L){return LNAME[L]||L}   /* 16/11/2026:
 function inLuong(L){return !S.luong||(S.luong==='OTHER'?LUONG.indexOf(L)<0:L===S.luong)}
 function lord(a,b){return LUONG.indexOf(a.luong)-LUONG.indexOf(b.luong)||(a.ma<b.ma?-1:1)}
 function projects(){return S.data.DuAn.filter(function(p){return inLuong(p.luong)}).sort(lord)}
+function setHdr(){var h=document.querySelector('header.top');if(h)document.documentElement.style.setProperty('--hdr',h.getBoundingClientRect().height+'px')}
+window.addEventListener('resize',setHdr);
 function lchip(L){return '<span class="lchip lu-'+L+'">'+esc(lname(L))+'</span>'}
 function pnHtml(p){return '<b class="pn">'+esc(p.ten)+'</b>'}
 /* TAG do admin gắn: giữ nguyên các tuần sau cho tới khi đổi */
@@ -726,12 +736,15 @@ function bindNoteLinks(el){el.querySelectorAll('a.tl').forEach(function(a){a.onc
 function vProject(v){
   if(!S.pj||!IX.pj[S.pj])return vProjectList(v);
   var p=IX.pj[S.pj],h=health(p),w=S.week,ts=IX.tasksBy[p.ma];
-  var html='<div><a class="muted" id="back" style="cursor:pointer;font-size:13px">‹ Tất cả dự án</a></div>';
-  html+='<section class="panel lu-'+p.luong+'" style="border-left:4px solid var(--lc)"><div class="bd phead"><div class="info"><div class="eyebrow">'+lchip(p.luong)+' · '+esc(p.loai_hinh)+' · mẫu '+esc(p.mau)+' · '+esc(p.ma)+'</div><h1>'+esc(p.ten)+'</h1>'+
-    '<div class="muted" style="font-size:13px">'+(p.ten_thuong_mai?'Tên thương mại: <b style="color:var(--ink)">'+esc(p.ten_thuong_mai)+'</b> · ':'')+(p.ten_goi_khac?'Tên khác: '+esc(p.ten_goi_khac):'')+'</div>'+
+  /* Thanh tiêu đề dự án gọn, cố định khi cuộn */
+  var html='<div class="pjbar lu-'+p.luong+'"><a class="pjback" id="back" title="Tất cả dự án" aria-label="Tất cả dự án">‹</a>'+
+    '<div class="pjt"><div class="pjm">'+lchip(p.luong)+'<span>'+esc(p.loai_hinh)+' · '+esc(p.ma)+(p.ten_goi_khac?' · '+esc(p.ten_goi_khac):'')+'</span></div><h1>'+esc(p.ten)+'</h1></div>'+
+    '<div class="pjmoc">'+(IX.moc[p.ma]||[]).map(function(m){var c=m.ngay_cdt?(m.ngay_cdt<w?'past':(m.ngay_cdt<=add(w,30)?'soon':'')):'';return '<div class="'+c+'"><span>'+esc(mocEn(m.moc))+'</span><b>'+(m.ngay_cdt?dmy(m.ngay_cdt):'–')+'</b></div>'}).join('')+'</div></div>';
+  html+='<section class="panel lu-'+p.luong+'" style="border-left:4px solid var(--lc)"><div class="bd phead"><div class="info">'+
+    (p.ten_thuong_mai?'<div class="muted" style="font-size:13px">Tên thương mại: <b style="color:var(--ink)">'+esc(p.ten_thuong_mai)+'</b></div>':'')+
     '<div class="row">'+(tagOf(p.ma)?'<span class="rag '+tagOf(p.ma)+'">Tag: '+TAG_EN[tagOf(p.ma)]+'</span>':'')+'<span class="st '+(p.trang_thai==='Đang chạy'?'run':'stop')+'">'+esc(p.trang_thai)+'</span><a class="more" id="pjHist">Lịch sử báo cáo tuần</a></div>'+
     '<div class="row" style="margin-top:4px">'+lkRow(p.ma)+(canLinkNew(p.ma)?'<button class="btn sm" id="pjLinks">'+((IX.links[p.ma]||[]).length?'Quản lý nút hồ sơ':'+ Nút hồ sơ')+'</button>':'')+'</div></div>';
-  html+='<div style="flex:1;min-width:260px"><div class="eyebrow" style="margin-bottom:6px">Investor milestones</div><div class="moc">'+(IX.moc[p.ma]||[]).map(function(m){var c=m.ngay_cdt?(m.ngay_cdt<w?'past':(m.ngay_cdt<=add(w,30)?'soon':'')):'';return '<div class="'+c+'"><span class="muted" style="font-size:12px">'+esc(mocEn(m.moc))+'</span><b>'+(m.ngay_cdt?dmy(m.ngay_cdt):'–')+'</b></div>'}).join('')+'</div></div></div></section>';
+  html+='</div></section>';
   // nhóm
   var groups=[],cur=null;
   var gmap={};
@@ -767,7 +780,7 @@ function vProject(v){
   });
   html+='</section>';
   v.innerHTML=html;
-  document.getElementById('back').onclick=function(){go('du-an',null)};
+  document.getElementById('back').onclick=function(){go('du-an',null)};setHdr();
   var pl=document.getElementById('pjLinks');if(pl)pl.onclick=function(){openLinks(p.ma)};
   var ph=document.getElementById('pjHist');if(ph)ph.onclick=function(){openPjHistory(p.ma)};
   if(EDIT)bindEdit(v);
