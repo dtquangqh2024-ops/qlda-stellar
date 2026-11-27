@@ -406,6 +406,14 @@ table tr.tg-Xám>td:first-child{box-shadow:inset 4px 0 0 var(--idle)}
 @media (max-width:640px){header.top .bar{row-gap:6px}header.top .brand{flex:1 1 100%;margin-right:0}header.top .user{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap}}
 /* ===================== hết STELLAR FLAT UI v1.1 ===================== */
 
+.av.zoomable{cursor:zoom-in;transition:transform .15s}.av.zoomable:hover{transform:scale(1.05)}
+.lightbox{position:fixed;inset:0;z-index:9999;background:rgba(10,18,32,.86);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;animation:lbIn .15s ease}
+.lightbox figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;max-width:100%}
+.lightbox img{width:min(480px,86vw);height:auto;max-height:78vh;object-fit:contain;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.5);background:#fff}
+.lightbox img.lb-low{filter:blur(2px)}
+.lightbox figcaption{color:#fff;font-weight:600;font-size:15px;text-align:center}.lightbox figcaption span{font-weight:400;opacity:.8}
+.lb-x{position:absolute;top:14px;right:18px;background:none;border:0;color:#fff;font-size:34px;line-height:1;cursor:pointer}
+@keyframes lbIn{from{opacity:0}to{opacity:1}}
 </style>
 
 <div id="root"><div class="loading">Loading…</div></div>
@@ -453,9 +461,11 @@ var api = LIVE ? {
   linkDelete:function(id){return call('api_linkDelete',S.token,id)},
   linkOrder:function(ma,ids){return call('api_linkOrder',S.token,ma,ids)},
   staff:function(){return call('api_staff',S.token)},
+  staffPhoto:function(ma){return call('api_staffPhoto',S.token,ma)},
   updateStaff:function(p){return call('api_updateStaff',S.token,p)}
 } : {
   updateStaff:function(p){var c=Object.assign({},p);delete c.ma;return Promise.resolve(c)},
+  staffPhoto:function(ma){var p=(window.DEMO_STAFF||[]).filter(function(x){return x.ma===ma})[0];return Promise.resolve(p?(p.anh_lon||p.anh||''):'')},
   staff:function(){var l=JSON.parse(JSON.stringify(window.DEMO_STAFF||[]));if(!canReview())l.forEach(function(p){delete p.ngay_sinh});return Promise.resolve(l)},
   people:function(){return Promise.resolve(DEMO.NhanSu.filter(function(p){return p.kich_hoat==='Có'&&p.ten.charAt(0)!=='('}))},
   login:function(t){var p=DEMO.NhanSu.filter(function(x){return x.ten===t})[0];return Promise.resolve({token:'demo',ten:p.ten,vai_tro:p.vai_tro})},
@@ -1479,6 +1489,16 @@ function bindStaffDrag(v){
       saveStaff(p,patch,given(p.ho_ten)+' → '+(patch.bo_mon?patch.bo_mon+' · ':'')+(d||b)).catch(err)});
   });
 }
+var PHOTO_CACHE={};
+function showPhoto(p){
+  var bx=document.createElement('div');bx.className='lightbox';
+  bx.innerHTML='<figure><img src="'+esc(p.anh)+'" alt="" class="lb-low"><figcaption>'+esc(p.ho_ten)+(p.chuc_danh?' · <span>'+esc(p.chuc_danh)+'</span>':'')+'</figcaption></figure><button class="lb-x" aria-label="Close">×</button>';
+  var kd=function(e){if(e.key==='Escape')close()},close=function(){bx.remove();document.removeEventListener('keydown',kd)};
+  bx.onclick=close;document.addEventListener('keydown',kd);document.body.appendChild(bx);
+  var img=bx.querySelector('img'),put=function(u){if(u){img.src=u;img.classList.remove('lb-low')}};
+  if(PHOTO_CACHE[p.ma])return put(PHOTO_CACHE[p.ma]);
+  api.staffPhoto(p.ma).then(function(u){PHOTO_CACHE[p.ma]=u;put(u)}).catch(function(){});
+}
 function openPerson(name){
   closeDrawer();
   var X=S.ppl,p=X.by[name];if(!p)return;var ED=adm();
@@ -1520,6 +1540,7 @@ function openPerson(name){
    '</div>';
   document.body.appendChild(bg);document.body.appendChild(d);
   document.getElementById('dx').onclick=closeDrawer;
+  var bav=d.querySelector('.dh .av');if(bav&&p.anh){bav.classList.add('zoomable');bav.title='View photo';bav.onclick=function(){showPhoto(p)}}
   d.querySelectorAll('[data-pp]').forEach(function(e){e.onclick=function(){openPerson(e.dataset.pp)}});
   d.querySelectorAll('[data-gopj]').forEach(function(e){e.onclick=function(){closeDrawer();go('du-an',e.dataset.gopj)}});
   var knBox=document.getElementById('knRows');
